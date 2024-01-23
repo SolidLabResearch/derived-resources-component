@@ -1,0 +1,40 @@
+{
+  "name": "derived-resources-component",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/derived-resources-component",
+  "lsd:components": "dist/components/components.jsonld",
+  "lsd:contexts": {
+    "https://linkedsoftwaredependencies.org/bundles/npm/derived-resources-component/^1.0.0/components/context.jsonld": "dist/components/context.jsonld"
+  },
+  "lsd:importPaths": {
+    "https://linkedsoftwaredependencies.org/bundles/npm/derived-resources-component/^1.0.0/components/": "dist/components/",
+    "https://linkedsoftwaredependencies.org/bundles/npm/derived-resources-component/^1.0.0/config/": "config/",
+    "https://linkedsoftwaredependencies.org/bundles/npm/derived-resources-component/^1.0.0/dist/": "dist/"
+  },
+  "scripts": {
+    "start": "community-solid-server -c @css:config/file.json config/derived.json -f .data -m .",
+    "start:debug": "community-solid-server -c @css:config/file-root.json config/derived.json -f .data -m . -t",
+    "start:example": "community-solid-server -c @css:config/file-root.json config/derived.json config/example.json -f .data -m . -t",
+    "build": "npm run build:ts && npm run build:components",
+    "build:components": "componentsjs-generator -s src -c dist/components -i .componentsignore -r derived",
+    "build:ts": "tsc",
+    "test": "jest"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@comunica/query-sparql": "^2.10.2",
+    "@rdfjs/types": "^1.1.0",
+    "@solid/community-server": "^7.0.3",
+    "asynciterator": "^3.8.1",
+    "n3": "^1.17.2",
+    "uri-template-lite": "^23.4.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.2",
+    "componentsjs-generator": "^3.1.2",
+    "rdf-js": "^4.0.2"
+  }
+}

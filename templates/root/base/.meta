@@ -1,0 +1,22 @@
+@prefix derived: <urn:npm:solid:derived-resources:> .
+
+<> a <http://www.w3.org/ns/pim/space#Storage>;
+    derived:derivedResource [
+        derived:template "test";
+        derived:selector </selector>;
+        derived:filter </filter>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "template/{var}";
+        derived:selector </selector>;
+        derived:filter </filter-var>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "pattern";
+        derived:selector </container/*>;
+        derived:filter </filter>
+    ].

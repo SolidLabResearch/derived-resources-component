@@ -1,0 +1,16 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^7.0.0/components/context.jsonld",
+  ],
+  "@graph": [
+    {
+      "@id": "urn:solid-server:derived:RootFolderOverride",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:RootFolderGenerator" },
+      "overrideParameters": {
+        "@type": "StaticFolderGenerator",
+        "templateFolder": "templates/root"
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+<http://localhost:3000/dummy.txt>
+    <urn:npm:solid:derived-resources:derivedResource> [
+        <urn:npm:solid:derived-resources:uriTemplate> "";
+        <urn:npm:solid:derived-resources:selector> <http://localhost:3000/selector>;
+        <urn:npm:solid:derived-resources:filter> <http://localhost:3000/filter>
+    ].
