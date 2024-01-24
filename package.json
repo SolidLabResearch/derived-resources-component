@@ -17,7 +17,7 @@
   "scripts": {
     "start": "community-solid-server -c @css:config/file.json config/derived.json -f .data -m .",
     "start:debug": "community-solid-server -c @css:config/file-root.json config/derived.json -f .data -m . -t",
-    "start:example": "community-solid-server -c @css:config/file-root.json config/derived.json config/example.json -f .data -m . -t",
+    "start:example": "community-solid-server -c @css:config/default.json config/derived.json config/example.json -m .",
     "build": "npm run build:ts && npm run build:components",
     "build:components": "componentsjs-generator -s src -c dist/components -i .componentsignore -r derived",
     "build:ts": "tsc",

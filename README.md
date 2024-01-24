@@ -22,12 +22,13 @@ consist of 3 components:
 To create a derived resource, the above 3 components should be described in the metadata of a container.
 For example:
 ```turtle
-<http://localhost:3000/>
-    <urn:npm:solid:derived-resources:derivedResource> [
-        <urn:npm:solid:derived-resources:template> "test";
-        <urn:npm:solid:derived-resources:selector> <http://localhost:3000/selector>;
-        <urn:npm:solid:derived-resources:filter> <http://localhost:3000/filter>
-    ].
+@prefix derived: <urn:npm:solid:derived-resources:> .
+
+<http://localhost:3000/> derived:derivedResource [
+    derived:template "test";
+    derived:selector <http://localhost:3000/selector>;
+    derived:filter <http://localhost:3000/filter>
+  ].
 ```
 If the above is in the metadata of container `http://localhost:3000/`,
 the resource `http://localhost:3000/test`.
@@ -85,13 +86,12 @@ as that resource has its own metadata defining it to be a derived resource.
 
 ## TODOs
 
-- Replace TODOs with actual comments.
 - Write tests for everything.
-- Create a script that generates test data or create a config that initializes the server with test data.
 
 ## Known limitations/decisions
 
 - No locks are used when reading data from the selectors. This to prevent potential deadlocks.
+- There is no caching, so derived resources are generated from scratch on every request.
 - Authorization on the selector resources is ignored.
   Note that this allows users to access data they do not have access to if they guess the URL of such data.
   We might want to implement it so creating a derived resource requires read access on all selectors,
@@ -102,3 +102,5 @@ as that resource has its own metadata defining it to be a derived resource.
   but also wants to allow content negotiation on the data stream it generates.
 - The metadata describing these resources is readable for anyone who can read the associated resource.
   If necessary, the solution could be changed to remove that metadata on GET requests.
+- The filter triple could be extended to also allow the value directly in the object instead of being in a separate resource.
+- The filter could be extended to also support external URIs.

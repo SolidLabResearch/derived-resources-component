@@ -19,7 +19,7 @@
       "@type": "DerivedResourceStore",
       "manager": {
         "@id": "urn:solid-server:derived:DerivationManager",
-        "@type": "RdfDerivationManager",
+        "@type": "MetadataDerivationManager",
         "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
         "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
         "selectorHandler": {
