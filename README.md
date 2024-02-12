@@ -3,7 +3,14 @@
 Adds support for derived resources to a
 [Community Solid Server](https://github.com/CommunitySolidServer/CommunitySolidServer) instance.
 
-Run `npm start` to have a CSS instance that combines `@css:config/file.json` with the new components here.
+## Install
+
+```
+npm install
+npm run build
+```
+
+Run `npm run start:example` to have a CSS instance that combines `@css:config/default.json` with the new components implementing the template `templates/root/base`. See 'Examples' below for a walkthrough of the demonstration.
 
 ## What are derived resources?
 
