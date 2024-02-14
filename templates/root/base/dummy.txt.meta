@@ -1,6 +1,8 @@
-<http://localhost:3000/dummy.txt>
-    <urn:npm:solid:derived-resources:derivedResource> [
-        <urn:npm:solid:derived-resources:uriTemplate> "";
-        <urn:npm:solid:derived-resources:selector> <http://localhost:3000/selector>;
-        <urn:npm:solid:derived-resources:filter> <http://localhost:3000/filter>
+@prefix derived: <urn:npm:solid:derived-resources:> .
+
+<> <http://www.w3.org/ns/ma-ont#format> "text/plain";
+    derived:derivedResource [
+        derived:template "";
+        derived:selector </selector>;
+        derived:filter </filter>
     ].
