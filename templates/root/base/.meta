@@ -3,14 +3,14 @@
 <> a <http://www.w3.org/ns/pim/space#Storage>;
     derived:derivedResource [
         derived:template "test";
-        derived:selector </selector>;
+        derived:selector </data>;
         derived:filter </filter>
     ].
 
 <>
     derived:derivedResource [
         derived:template "template/{var}";
-        derived:selector </selector>;
+        derived:selector </data>;
         derived:filter </filter-var>
     ].
 

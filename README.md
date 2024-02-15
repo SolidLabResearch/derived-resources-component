@@ -34,13 +34,13 @@ For example:
 
 <http://localhost:3000/> derived:derivedResource [
     derived:template "test";
-    derived:selector <http://localhost:3000/selector>;
+    derived:selector <http://localhost:3000/data>;
     derived:filter <http://localhost:3000/filter>
   ].
 ```
 The above metadata, when placed in the metadata of container `http://localhost:3000`,
 defines `http://localhost:3000/test` as a derived resource.
-The contents are defined by using `http://localhost:3000/selector`
+The contents are defined by using `http://localhost:3000/data`
 as an input for the query found at `http://localhost:3000/filter`.
 
 The last modified date, and the resulting ETag, of the derived resource
