@@ -84,7 +84,7 @@ export class MetadataDerivationManager implements DerivationManager {
       const result = await this.store.getRepresentation(identifier, {}, conditions);
       const config = this.findMatchingDerivation(identifier, result.metadata);
       if (config) {
-        return this.deriveResource(identifier, config);
+        return this.deriveResource(identifier, config, result);
       }
       // Return the original result if this is not a derived resource
       return result;
@@ -162,7 +162,7 @@ export class MetadataDerivationManager implements DerivationManager {
   /**
    * Generates the representation for the derived resource.
    */
-  protected async deriveResource(identifier: ResourceIdentifier, config: DerivationConfig): Promise<Representation> {
+  protected async deriveResource(identifier: ResourceIdentifier, config: DerivationConfig, representation?: Representation): Promise<Representation> {
     this.logger.debug(`Deriving contents of resource ${identifier.path}`);
 
     // Collect data from all selectors
@@ -172,8 +172,11 @@ export class MetadataDerivationManager implements DerivationManager {
     // Apply the filter to the data
     const result = await this.filterHandler.handleSafe({ mappings: config.mappings, filter: config.filter, data });
 
+    // Reuse metadata if the resource had existing metadata
+    const resultMetadata = representation?.metadata ?? new RepresentationMetadata(identifier);
+    resultMetadata.contentType = INTERNAL_QUADS;
+
     // Set the last modified time to that of the last modified source
-    const resultMetadata = new RepresentationMetadata(identifier, INTERNAL_QUADS);
     this.setLastModified(resultMetadata, sourceMetadatas);
 
     return new BasicRepresentation(result, resultMetadata);
