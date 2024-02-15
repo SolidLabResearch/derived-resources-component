@@ -20,3 +20,10 @@
         derived:selector </container/*>;
         derived:filter </filter>
     ].
+
+<>
+    derived:derivedResource [
+        derived:template "multiple";
+        derived:selector </container/data1>, </container/data2>;
+        derived:filter </filter>
+    ].
