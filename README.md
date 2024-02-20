@@ -65,10 +65,9 @@ All metadata assigned to this resource will be copied to the corresponding deriv
 
 The data of all resources linked here is combined before executing the filter in the next step.
 
-Instead of a fixed URL, these can also contain a Wildcard
-to select all elements in a container in the form of `/*`.
+Instead of a fixed URL, these can also contain glob patterns `*` and `**`
 For example, if the object in the selector triple is `"http://localhost:3000/*"`,
-all documents found in the `http://localhost:3000/` container are used.
+all resources found in the `http://localhost:3000/` container are used.
 
 ### Filter
 
