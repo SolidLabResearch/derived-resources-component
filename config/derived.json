@@ -24,7 +24,7 @@
         "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
         "selectorHandler": {
           "@id": "urn:solid-server:default:SelectorHandler",
-          "@type": "WildcardSelectorHandler",
+          "@type": "GlobSelectorHandler",
           "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" }
         },
         "filterHandler": {
