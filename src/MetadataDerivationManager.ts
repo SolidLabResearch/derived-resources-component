@@ -1,8 +1,10 @@
-import { BlankNode, NamedNode, Term } from '@rdfjs/types';
+import { Term } from '@rdfjs/types';
 import {
   BasicRepresentation,
   Conditions,
-  DC, getLoggerFor,
+  createErrorMessage,
+  DC,
+  getLoggerFor,
   IdentifierStrategy,
   INTERNAL_QUADS,
   NotFoundHttpError,
@@ -12,10 +14,10 @@ import {
   ResourceStore,
   updateModifiedDate
 } from '@solid/community-server';
-import { Store, Util } from 'n3';
+import { Store } from 'n3';
 import { once } from 'node:events';
-import Template from 'uri-template-lite';
 import { DerivationManager } from './DerivationManager';
+import { DerivationMatcher } from './DerivationMatcher';
 import { FilterHandler } from './FilterHandler';
 import { SelectorHandler } from './SelectorHandler';
 import { DERIVED } from './Vocabularies';
@@ -27,6 +29,7 @@ interface DerivationConfig {
 }
 
 interface MetadataDerivationManagerArgs {
+  derivationMatcher: DerivationMatcher;
   selectorHandler: SelectorHandler;
   filterHandler: FilterHandler;
   identifierStrategy: IdentifierStrategy;
@@ -53,12 +56,14 @@ interface MetadataDerivationManagerArgs {
 export class MetadataDerivationManager implements DerivationManager {
   protected logger = getLoggerFor(this);
 
+  protected derivationMatcher: DerivationMatcher;
   protected selectorHandler: SelectorHandler;
   protected filterHandler: FilterHandler;
   protected identifierStrategy: IdentifierStrategy;
   protected store: ResourceStore;
 
   public constructor(args: MetadataDerivationManagerArgs) {
+    this.derivationMatcher = args.derivationMatcher;
     this.selectorHandler = args.selectorHandler;
     this.filterHandler = args.filterHandler;
     this.identifierStrategy = args.identifierStrategy;
@@ -68,7 +73,7 @@ export class MetadataDerivationManager implements DerivationManager {
   public async isDerivedResource(identifier: ResourceIdentifier): Promise<boolean> {
     try {
       const representation = await this.getFirstExistingResource(identifier);
-      const config = this.findMatchingDerivation(identifier, representation.metadata);
+      const config = await this.findMatchingDerivation(identifier, representation.metadata);
       return Boolean(config);
     } catch(error: unknown) {
       // Depending on the backend, it is possible that the root container does not exist yet which could throw an error
@@ -82,7 +87,7 @@ export class MetadataDerivationManager implements DerivationManager {
   public async handleResource(identifier: ResourceIdentifier, conditions?: Conditions): Promise<Representation> {
     try {
       const result = await this.store.getRepresentation(identifier, {}, conditions);
-      const config = this.findMatchingDerivation(identifier, result.metadata);
+      const config = await this.findMatchingDerivation(identifier, result.metadata);
       if (config) {
         return this.deriveResource(identifier, config, result);
       }
@@ -94,7 +99,7 @@ export class MetadataDerivationManager implements DerivationManager {
         // In case the target does not exist, find the first parent container that does
         const parent = await this.getFirstExistingResource(this.identifierStrategy.getParentContainer(identifier));
         this.logger.debug(`${parent.metadata.identifier.value} is the first parent container that exists for ${identifier.path}`);
-        const config = this.findMatchingDerivation(identifier, parent.metadata);
+        const config = await this.findMatchingDerivation(identifier, parent.metadata);
         if (config) {
           return this.deriveResource(identifier, config);
         }
@@ -123,38 +128,14 @@ export class MetadataDerivationManager implements DerivationManager {
   /**
    * Finds the derivation triples in the given metadata that correspond to the given identifier, if any.
    */
-  protected findMatchingDerivation(identifier: ResourceIdentifier, metadata: RepresentationMetadata): DerivationConfig | undefined {
+  protected async findMatchingDerivation(identifier: ResourceIdentifier, metadata: RepresentationMetadata): Promise<DerivationConfig | undefined> {
     const derived = metadata.getAll(DERIVED.terms.derivedResource);
-    // Templates are relative to the resource they are linked to
-    const relative = identifier.path.slice(metadata.identifier.value.length);
 
-    for (const entry of derived) {
-      if (!this.isValidDerivedSubject(entry)) {
-        this.logger.error(`Subjects of derived:derivedResource should be Named or Blank nodes, found a ${entry.termType} with value ${entry.value}`);
-        continue;
-      }
-
-      const templates = metadata.quads(entry, DERIVED.terms.template);
-      if (templates.length !== 1) {
-        this.logger.error(`Derived resources need exactly 1 template. Found ${templates.length} for ${entry.value}`);
-        continue;
-      }
-      const template = templates[0].object.value;
-
-      const match = new Template(template).match(relative);
-      if (match) {
-        const filters = metadata.quads(entry, DERIVED.terms.filter);
-        if (filters.length !== 1) {
-          this.logger.error(`Derived resources need exactly 1 filter. Found ${filters.length} for ${entry.value}`);
-          continue;
-        }
-
-        this.logger.debug(`Found derived resource match for ${identifier.path} with subject ${entry.value} and template ${template}`);
-        return {
-          mappings: match,
-          selectors: metadata.quads(entry, DERIVED.terms.selector).map((quad): string => quad.object.value),
-          filter: filters[0].object.value,
-        };
+    for (const subject of derived) {
+      try {
+        return await this.derivationMatcher.handleSafe({ identifier, metadata, subject })
+      } catch (error: unknown) {
+        this.logger.debug(`Did not found a valid derivation for ${identifier.path}: ${createErrorMessage(error)}`);
       }
     }
   }
@@ -218,12 +199,5 @@ export class MetadataDerivationManager implements DerivationManager {
     if (lastModified > 0) {
       updateModifiedDate(resultMetadata, new Date(lastModified));
     }
-  }
-
-  /**
-   * Returns true if the term is a Named or Blank node.
-   */
-  protected isValidDerivedSubject(term: Term): term is NamedNode | BlankNode {
-    return term.termType === 'NamedNode' || term.termType === 'BlankNode';
   }
 }
