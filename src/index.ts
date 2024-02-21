@@ -4,6 +4,7 @@ export * from './DerivedResourceStore';
 export * from './FilterHandler';
 export * from './GlobSelectorHandler';
 export * from './MetadataDerivationManager';
+export * from './PresetDerivationMatcher';
 export * from './SelectorHandler';
 export * from './SparqlFilterHandler';
 export * from './TemplateDerivationMatcher';

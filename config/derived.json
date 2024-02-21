@@ -28,7 +28,10 @@
         "@type": "MetadataDerivationManager",
         "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
         "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
-        "derivationMatcher": { "@type": "TemplateDerivationMatcher" },
+        "derivationMatcher": {
+          "@type": "PresetDerivationMatcher",
+          "source": { "@type": "TemplateDerivationMatcher" }
+        },
         "selectorHandler": {
           "@id": "urn:solid-server:default:SelectorHandler",
           "@type": "GlobSelectorHandler",
