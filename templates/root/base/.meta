@@ -4,7 +4,7 @@
     derived:derivedResource [
         derived:template "test";
         derived:selector </data>;
-        derived:filter </filter>
+        derived:filter </filters/name>
     ].
 
 <>
@@ -25,19 +25,19 @@
     derived:derivedResource [
         derived:template "template/{var}";
         derived:selector </data>;
-        derived:filter </filter-var>
+        derived:filter </filters/var>
     ].
 
 <>
     derived:derivedResource [
         derived:template "pattern";
         derived:selector </container/*>;
-        derived:filter </filter>
+        derived:filter </filters/name>
     ].
 
 <>
     derived:derivedResource [
         derived:template "multiple";
         derived:selector </container/data1>, </container/data2>;
-        derived:filter </filter>
+        derived:filter </filters/name>
     ].
