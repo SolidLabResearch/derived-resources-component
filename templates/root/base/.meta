@@ -9,6 +9,20 @@
 
 <>
     derived:derivedResource [
+        derived:template "";
+        derived:selector </.meta>;
+        derived:filter </filters/container>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "template/";
+        derived:selector </.meta>;
+        derived:filter </filters/container>
+    ].
+
+<>
+    derived:derivedResource [
         derived:template "template/{var}";
         derived:selector </data>;
         derived:filter </filter-var>
