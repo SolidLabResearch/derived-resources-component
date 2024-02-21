@@ -34,8 +34,6 @@ export class GlobSelectorHandler extends SelectorHandler {
     return asyncToArray(this.handleSelector(selector));
   }
 
-  // TODO: https://www.digitalocean.com/community/tools/glob
-  // TODO:
   protected async *handleSelector(path: string): AsyncIterable<ResourceIdentifier> {
     const match = /\*\*?/.exec(path);
     if (!match) {
@@ -55,7 +53,6 @@ export class GlobSelectorHandler extends SelectorHandler {
     let childPaths = container.metadata.getAll(LDP.terms.contains).map((term): string => term.value);
     const params: GlobParameters = { glob, head, tail, childPaths };
 
-    // TODO: logging
     if (!head.endsWith('/') || (tail.length > 0 && !tail.startsWith('/'))) {
       yield* this.handleInternalGlob(params);
     } else if (glob === '**') {
