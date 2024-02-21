@@ -1,9 +1,9 @@
 import { QueryEngine } from '@comunica/query-sparql';
 import { Quad } from '@rdfjs/types';
 import {
-  createErrorMessage, getLoggerFor,
+  createErrorMessage,
+  getLoggerFor,
   Guarded,
-  guardedStreamFrom,
   guardStream,
   InternalServerError,
   readableToString,
