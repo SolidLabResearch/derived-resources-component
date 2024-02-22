@@ -16,6 +16,13 @@
 
 <>
     derived:derivedResource [
+        derived:template "query{?var}";
+        derived:selector </data>;
+        derived:filter </filter-var>
+    ].
+
+<>
+    derived:derivedResource [
         derived:template "pattern";
         derived:selector </container/*>;
         derived:filter </filter>

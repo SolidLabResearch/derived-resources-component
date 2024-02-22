@@ -88,6 +88,8 @@ The metadata of the root container defines 4 different derived resources:
 - `http://localhost:3000/test`: A basic derived resource applying a query to a single selector.
 - `http://localhost:3000/template/{var}`: A template for derived resources where `var` will be applied to the query.
      You can try out http://localhost:3000/template/foaf:knows and http://localhost:3000/template/foaf:name.
+- `http://localhost:3000/query`: Similar to the previous example, but instead uses a query parameter for the variable.
+     For example, `http://localhost:3000/query?var=foaf:knows`.
 - `http://localhost:3000/pattern`: A derived resource whose selectors are all resources in a container.
 - `http://localhost:3000/multiple`: A derived resource with multiple selectors.
 

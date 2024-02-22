@@ -48,6 +48,7 @@ export class SparqlFilterHandler extends FilterHandler {
 
     const engine = new QueryEngine();
     try {
+      console.log(query);
       const result = await engine.queryQuads(query, { sources: [data] });
       return guardStream(Readable.from(this.convertAsyncIterator(result)));
     } catch(error: unknown) {

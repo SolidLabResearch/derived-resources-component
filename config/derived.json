@@ -44,6 +44,19 @@
         "@type": "PatchingStore",
         "source": { "@id": "urn:solid-server:derived:RepresentationConvertingStore" }
       }
+    },
+    {
+      "comment": [
+        "Keep query parameters in identifiers.",
+        "This makes it so that any query parameters can cause issues with normal resources so we might want a more robust solution."
+      ],
+      "@id": "urn:solid-server:derived:TargetExtractorOverride",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:TargetExtractor" },
+      "overrideParameters": {
+        "@type": "OriginalUrlExtractor",
+        "includeQueryString": true
+      }
     }
   ]
 }
