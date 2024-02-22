@@ -4,5 +4,5 @@
     derived:derivedResource [
         derived:template "";
         derived:selector </data>;
-        derived:filter </filter>
+        derived:filter </filters/name>
     ].
