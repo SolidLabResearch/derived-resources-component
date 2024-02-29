@@ -3,7 +3,7 @@
 <> a <http://www.w3.org/ns/pim/space#Storage>;
     derived:derivedResource [
         derived:template "test";
-        derived:selector </data>;
+        derived:selector </selectors/data>;
         derived:filter </filters/name>
     ].
 
@@ -24,20 +24,20 @@
 <>
     derived:derivedResource [
         derived:template "template/{var}";
-        derived:selector </data>;
+        derived:selector </selectors/data>;
         derived:filter </filters/var>
     ].
 
 <>
     derived:derivedResource [
         derived:template "pattern";
-        derived:selector </container/*>;
+        derived:selector </selectors/container/*>;
         derived:filter </filters/name>
     ].
 
 <>
     derived:derivedResource [
         derived:template "multiple";
-        derived:selector </container/data1>, </container/data2>;
+        derived:selector </selectors/container/data1>, </selectors/container/data2>;
         derived:filter </filters/name>
     ].
