@@ -1,10 +1,9 @@
 PREFIX derived: <urn:npm:solid:derived-resources:>
 PREFIX ldp: <http://www.w3.org/ns/ldp#>
 
-CONSTRUCT { <$identifier$> ldp:contains ?child }
+CONSTRUCT { <$identifier$> ldp:contains [ derived:templateUrl ?childStr ] }
 WHERE {
   ?s derived:template ?o.
   BIND(concat("$source$", ?o) as ?childStr).
-  BIND(uri(?childStr) as ?child).
-  FILTER regex(?childStr, "^$identifier$[^/]+/?$")
+  FILTER regex(?childStr, "^$identifier$[^/]*{[^/]*/?$")
 }

@@ -31,8 +31,8 @@
 <>
     derived:derivedResource [
         derived:template "query{?var}";
-        derived:selector </data>;
-        derived:filter </filter-var>
+        derived:selector </selectors/data>;
+        derived:filter </filters/var>
     ].
 
 <>
