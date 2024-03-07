@@ -3,48 +3,48 @@
 <> a <http://www.w3.org/ns/pim/space#Storage>;
     derived:derivedResource [
         derived:template "test";
-        derived:selector </selectors/data>;
-        derived:filter </filters/name>
+        derived:selector <selectors/data>;
+        derived:filter <filters/name>
     ].
 
 <>
     derived:derivedResource [
         derived:template "";
-        derived:selector </.meta>;
-        derived:filter </filters/container>
+        derived:selector <.meta>;
+        derived:filter <filters/container>
     ].
 
 <>
     derived:derivedResource [
         derived:template "template/";
-        derived:selector </.meta>;
-        derived:filter </filters/container>
+        derived:selector <.meta>;
+        derived:filter <filters/container>
     ].
 
 <>
     derived:derivedResource [
         derived:template "template/{var}";
-        derived:selector </selectors/data>;
-        derived:filter </filters/var>
+        derived:selector <selectors/data>;
+        derived:filter <filters/var>
     ].
 
 <>
     derived:derivedResource [
         derived:template "query{?var}";
-        derived:selector </selectors/data>;
-        derived:filter </filters/var>
+        derived:selector <selectors/data>;
+        derived:filter <filters/var>
     ].
 
 <>
     derived:derivedResource [
         derived:template "pattern";
-        derived:selector </selectors/container/*>;
-        derived:filter </filters/name>
+        derived:selector <selectors/container/*>;
+        derived:filter <filters/name>
     ].
 
 <>
     derived:derivedResource [
         derived:template "multiple";
-        derived:selector </selectors/container/data1>, </selectors/container/data2>;
-        derived:filter </filters/name>
+        derived:selector <selectors/container/data1>, </selectors/container/data2>;
+        derived:filter <filters/name>
     ].
