@@ -9,7 +9,9 @@ Adds support for derived resources to a
 
 A public instance of a Solid server implementing this component can be found at
 <https://demo.knows.idlab.ugent.be/eswc2024/derived-resources/>.
-It contains all the example resources described in the example [section](#examples) below.
+It contains all the example resources described in the example [section](#examples) below,
+which means the main metadata description resource can be found
+[here](https://demo.knows.idlab.ugent.be/eswc2024/derived-resources/.meta).
 
 ## Install
 
