@@ -1,5 +1,5 @@
 {
-  "name": "derived-resources-component",
+  "name": "@solidlab/derived-resources-component",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
