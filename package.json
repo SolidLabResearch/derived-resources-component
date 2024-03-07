@@ -23,6 +23,10 @@
     "build:ts": "tsc",
     "test": "jest"
   },
+  "files": [
+    "dist",
+    "config"
+  ],
   "license": "MIT",
   "dependencies": {
     "@comunica/query-sparql": "^2.10.2",
