@@ -1,6 +1,6 @@
 {
   "name": "@solidlab/derived-resources-component",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Adds derived resources to the Community Solid Server",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
