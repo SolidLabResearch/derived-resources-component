@@ -1,7 +1,15 @@
 # Derived resources
 
+[![npm version](https://img.shields.io/npm/v/@solidlab/derived-resources-component)](https://www.npmjs.com/package/@solidlab/derived-resources-component)
+
 Adds support for derived resources to a
 [Community Solid Server](https://github.com/CommunitySolidServer/CommunitySolidServer) instance.
+
+## Public instance
+
+A public instance of a Solid server implementing this component can be found at
+<https://demo.knows.idlab.ugent.be/eswc2024/derived-resources/>.
+It contains all the example resources described in the example [section](#examples) below.
 
 ## Install
 
