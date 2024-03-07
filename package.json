@@ -1,7 +1,7 @@
 {
   "name": "@solidlab/derived-resources-component",
   "version": "1.0.0",
-  "description": "",
+  "description": "Adds derived resources to the Community Solid Server",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/derived-resources-component",
