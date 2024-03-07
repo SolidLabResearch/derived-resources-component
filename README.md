@@ -138,3 +138,5 @@ The query can be seen at `http://localhost:3000/filters/container`.
   If necessary, the solution could be changed to remove that metadata on GET requests.
 - The filter triple could be extended to also allow the value directly in the object instead of being in a separate resource.
 - The filter could be extended to also support external URIs.
+- To make URI templates with query parameters work, query parameters are not stripped from incoming URLs.
+  For standard, non-derived, resources this can cause issues if an unexpected query parameter is part of the URL.
