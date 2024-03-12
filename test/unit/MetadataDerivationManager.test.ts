@@ -101,6 +101,8 @@ describe('MetadataDerivationManager', (): void => {
     await expect(readableToString(result.data)).resolves.toBe('derived');
     expect(result.metadata.contentType).toBe(INTERNAL_QUADS);
     expect(result.metadata.get(DC.terms.modified)?.value).toBe(date.toISOString());
+    expect(result.metadata.get(DERIVED.terms.selector)?.value).toBe(selector);
+    expect(result.metadata.get(DERIVED.terms.filter)?.value).toBe(filter);
   });
 
   it('returns the original resource if there is no derivation metadata.', async(): Promise<void> => {

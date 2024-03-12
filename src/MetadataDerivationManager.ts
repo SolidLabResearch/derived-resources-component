@@ -14,13 +14,14 @@ import {
   ResourceStore,
   updateModifiedDate
 } from '@solid/community-server';
-import { Store } from 'n3';
+import { DataFactory, Store } from 'n3';
 import { once } from 'node:events';
 import { DerivationManager } from './DerivationManager';
 import { DerivationMatcher } from './DerivationMatcher';
 import { FilterHandler } from './FilterHandler';
 import { SelectorHandler } from './SelectorHandler';
 import { DERIVED } from './Vocabularies';
+import namedNode = DataFactory.namedNode;
 
 interface DerivationConfig {
   mappings: Record<string, string>;
@@ -52,6 +53,8 @@ interface MetadataDerivationManagerArgs {
  * To generate the derived resource representation, a {@link SelectorHandler} is called for each selector triple.
  * The triples of these selectors get merged into a single RDF dataset,
  * which is then sent to a {@link FilterHandler} to generate an output stream.
+ *
+ * Metadata is added to the resulting resource to indicate which selectors and filters were used.
  */
 export class MetadataDerivationManager implements DerivationManager {
   protected logger = getLoggerFor(this);
@@ -157,8 +160,9 @@ export class MetadataDerivationManager implements DerivationManager {
     const resultMetadata = representation?.metadata ?? new RepresentationMetadata(identifier);
     resultMetadata.contentType = INTERNAL_QUADS;
 
-    // Set the last modified time to that of the last modified source
+    // Add necessary metadata
     this.setLastModified(resultMetadata, sourceMetadatas);
+    this.addDerivationMetadata(resultMetadata, config);
 
     return new BasicRepresentation(result, resultMetadata);
   }
@@ -199,5 +203,15 @@ export class MetadataDerivationManager implements DerivationManager {
     if (lastModified > 0) {
       updateModifiedDate(resultMetadata, new Date(lastModified));
     }
+  }
+
+  /**
+   * Adds triples to indicate all the resources that were used to generate the derived resource.
+   */
+  protected addDerivationMetadata(metadata: RepresentationMetadata, config: DerivationConfig): void {
+    for (const selector of config.selectors) {
+      metadata.add(DERIVED.terms.selector, namedNode(selector));
+    }
+    metadata.add(DERIVED.terms.filter, namedNode(config.filter));
   }
 }
