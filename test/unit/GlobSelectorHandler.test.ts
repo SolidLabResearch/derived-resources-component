@@ -1,7 +1,7 @@
 import { BasicRepresentation, LDP, RepresentationMetadata, ResourceStore } from '@solid/community-server';
 import { GlobSelectorHandler } from '../../src/GlobSelectorHandler';
 
-describe('A GlobSelectorHandler', (): void => {
+describe('GlobSelectorHandler', (): void => {
   let store: jest.Mocked<ResourceStore>;
   let handler: GlobSelectorHandler;
   const mappings = {};

@@ -12,7 +12,7 @@ import {
 import * as asyncIt from 'asynciterator';
 import { on } from 'node:events';
 import { Readable } from 'node:stream';
-import { FilterHandler, FilterManagerInput } from './FilterHandler';
+import { FilterHandler, FilterHandlerInput } from './FilterHandler';
 
 /**
  * Filters a dataset using a SPARQL query.
@@ -30,7 +30,7 @@ export class SparqlFilterHandler extends FilterHandler {
     this.store = store;
   }
 
-  public async handle({ mappings, data, filter }: FilterManagerInput): Promise<Guarded<Readable>> {
+  public async handle({ mappings, data, filter }: FilterHandlerInput): Promise<Guarded<Readable>> {
     let query: string;
     try {
       const representation = await this.store.getRepresentation({ path: filter }, {});

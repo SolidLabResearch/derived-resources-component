@@ -23,10 +23,10 @@ export class PresetDerivationMatcher extends DerivationMatcher {
       ...result.mappings,
       source: input.metadata.identifier.value,
       identifier: input.identifier.path,
-    }
+    };
     return {
       ...result,
       mappings
-    }
+    };
   }
 }

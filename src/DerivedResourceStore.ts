@@ -25,7 +25,7 @@ export class DerivedResourceStore extends PassthroughStore {
   }
 
   public async hasResource(identifier: ResourceIdentifier): Promise<boolean> {
-    const exists = this.source.hasResource(identifier);
+    const exists = await this.source.hasResource(identifier);
     if (exists) {
       return exists;
     }

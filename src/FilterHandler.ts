@@ -2,7 +2,7 @@ import { AsyncHandler, Guarded } from '@solid/community-server';
 import { Store } from 'n3';
 import { Readable } from 'node:stream';
 
-export interface FilterManagerInput {
+export interface FilterHandlerInput {
   /**
    * Mappings to assign values to variables.
    */
@@ -20,4 +20,4 @@ export interface FilterManagerInput {
 /**
  * Applies a filter to a dataset.
  */
-export abstract class FilterHandler extends AsyncHandler<FilterManagerInput, Guarded<Readable>>{}
+export abstract class FilterHandler extends AsyncHandler<FilterHandlerInput, Guarded<Readable>>{}
