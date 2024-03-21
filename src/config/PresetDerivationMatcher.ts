@@ -1,4 +1,5 @@
-import { DerivationConfig, DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
+import { DerivationConfig } from '../DerivationConfig';
+import { DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
 
 /**
  * Adds certain preset values to the resulting mappings of another {@link DerivationMatcher}.

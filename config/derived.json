@@ -23,27 +23,43 @@
       "comment": "The store responsible for generating derived resources.",
       "@id": "urn:solid-server:derived:DerivedResourceStore",
       "@type": "DerivedResourceStore",
+      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+      "source": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
       "manager": {
         "@id": "urn:solid-server:derived:DerivationManager",
-        "@type": "MetadataDerivationManager",
-        "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
-        "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
+        "@type": "BaseDerivationManager",
         "derivationMatcher": {
           "@type": "PresetDerivationMatcher",
           "source": { "@type": "TemplateDerivationMatcher" }
         },
         "selectorHandler": {
           "@id": "urn:solid-server:default:SelectorHandler",
-          "@type": "GlobSelectorHandler",
-          "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" }
+          "@type": "BaseSelectorHandler",
+          "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
+          "parser": {
+            "@type": "GlobSelectorParser",
+            "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" }
+          }
         },
         "filterHandler": {
           "@id": "urn:solid-server:default:FilterHandler",
-          "@type": "SparqlFilterHandler",
-          "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" }
+          "@type": "BaseFilterHandler",
+          "parser": {
+            "@id": "urn:solid-server:default:FilterParser",
+            "@type": "StringResourceFilterParser",
+            "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
+            "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" }
+          },
+          "executor": {
+            "@id": "urn:solid-server:default:FilterExecutor",
+            "@type": "MappingFilterExecutor",
+            "source": {
+              "@type": "RdfFilterExecutor",
+              "source": { "@type": "SparqlFilterExecutor" }
+            }
+          }
         }
-      },
-      "source": { "@id": "urn:solid-server:default:ResourceStore_Patching" }
+      }
     },
     {
       "comment": "Insert our new stores in front of the original converting store.",

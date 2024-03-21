@@ -1,6 +1,6 @@
 import { AsyncHandler, ResourceIdentifier } from '@solid/community-server';
 
-export interface SelectorHandlerInput {
+export interface SelectorParserInput {
   /**
    * Mappings to assign values to variables.
    */
@@ -12,6 +12,6 @@ export interface SelectorHandlerInput {
 }
 
 /**
- * Determines one or more {@link ResourceIdentifier} based on a selector.
+ * Determines which resources should be selected based on the selector info.
  */
-export abstract class SelectorHandler extends AsyncHandler<SelectorHandlerInput, ResourceIdentifier[]> {}
+export abstract class SelectorParser extends AsyncHandler<SelectorParserInput, ResourceIdentifier[]> {}

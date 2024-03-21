@@ -6,8 +6,9 @@ import {
   ResourceIdentifier
 } from '@solid/community-server';
 import Template from 'uri-template-lite';
-import { DerivationConfig, DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
-import { DERIVED } from './Vocabularies';
+import { DerivationConfig } from '../DerivationConfig';
+import { DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
+import { DERIVED } from '../Vocabularies';
 
 /**
  * Finds a matching derivation by matching the identifier to a template string.
@@ -55,6 +56,7 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
 
     this.logger.debug(`Found derived resource match for ${identifier.path} with subject ${subject.value}`);
     return {
+      identifier,
       mappings: match,
       selectors: metadata.quads(subject as NamedNode, DERIVED.terms.selector).map((quad): string => quad.object.value),
       filter: filters[0].object.value,
