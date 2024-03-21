@@ -1,13 +1,15 @@
-import { BlankNode, NamedNode, Term } from '@rdfjs/types';
+import { BlankNode, NamedNode, Quad, Term } from '@rdfjs/types';
 import {
   getLoggerFor,
   InternalServerError,
   NotImplementedHttpError,
+  RepresentationMetadata,
   ResourceIdentifier
 } from '@solid/community-server';
 import Template from 'uri-template-lite';
-import { DerivationConfig, DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
-import { DERIVED } from './Vocabularies';
+import { DerivationConfig } from '../DerivationConfig';
+import { DERIVED } from '../Vocabularies';
+import { DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
 
 /**
  * Finds a matching derivation by matching the identifier to a template string.
@@ -53,11 +55,16 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
       throw new InternalServerError(`Derived resources need exactly 1 filter. Found ${filters.length} for ${subject.value}`);
     }
 
+    const configMetadata = new RepresentationMetadata(subject as NamedNode);
+    configMetadata.addQuads([...this.getRelevantQuads(subject, metadata)]);
+
     this.logger.debug(`Found derived resource match for ${identifier.path} with subject ${subject.value}`);
     return {
+      identifier,
       mappings: match,
       selectors: metadata.quads(subject as NamedNode, DERIVED.terms.selector).map((quad): string => quad.object.value),
       filter: filters[0].object.value,
+      metadata: configMetadata,
     };
   }
 
@@ -66,5 +73,21 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
    */
   protected isValidDerivedSubject(term: Term): term is NamedNode | BlankNode {
     return term.termType === 'NamedNode' || term.termType === 'BlankNode';
+  }
+
+  protected *getRelevantQuads(subject: Term, metadata: RepresentationMetadata, cache: Set<string> = new Set()): Iterable<Quad> {
+    if (subject.termType !== 'NamedNode' && subject.termType !== 'BlankNode') {
+      return;
+    }
+    if (cache.has(subject.value)) {
+      return;
+    }
+    cache.add(subject.value);
+    const quads = metadata.quads(subject);
+    yield* quads;
+
+    for (const quad of quads) {
+      yield* this.getRelevantQuads(quad.object, metadata, cache);
+    }
   }
 }
