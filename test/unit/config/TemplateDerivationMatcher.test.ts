@@ -1,9 +1,9 @@
 import { InternalServerError, NotImplementedHttpError, RepresentationMetadata } from '@solid/community-server';
 import { DataFactory } from 'n3';
-import { TemplateDerivationMatcher } from '../../src/TemplateDerivationMatcher';
-import { DERIVED } from '../../src/Vocabularies';
-import namedNode = DataFactory.namedNode;
+import { TemplateDerivationMatcher } from '../../../src/config/TemplateDerivationMatcher';
+import { DERIVED } from '../../../src/Vocabularies';
 import literal = DataFactory.literal;
+import namedNode = DataFactory.namedNode;
 
 describe('TemplateDerivationMatcher', (): void => {
   const identifier = { path: 'https://example.com/foo' };
@@ -18,6 +18,7 @@ describe('TemplateDerivationMatcher', (): void => {
     metadata.addQuad(subject, DERIVED.terms.template, 'foo');
     metadata.addQuad(subject, DERIVED.terms.selector, selector);
     metadata.addQuad(subject, DERIVED.terms.filter, filter);
+    metadata.addQuad(namedNode('otherSubject'), DERIVED.terms.template, 'notFoo');
 
     matcher = new TemplateDerivationMatcher();
   });
@@ -56,21 +57,29 @@ describe('TemplateDerivationMatcher', (): void => {
 
   it('parses the metadata to return a config.', async(): Promise<void> => {
     await expect(matcher.canHandle({ identifier, subject, metadata })).resolves.toBeUndefined();
-    await expect(matcher.handle({ identifier, subject, metadata })).resolves.toEqual({
+    const result = await matcher.handle({ identifier, subject, metadata });
+    expect(result).toEqual(expect.objectContaining({
+      identifier,
       mappings: {},
       selectors: [ selector ],
       filter,
-    });
+    }));
+    expect(result.metadata.quads()).toHaveLength(3);
+    expect(result.metadata.identifier).toBe(subject);
   });
 
   it('extracts variables from the template URI.', async(): Promise<void> => {
     metadata.removeQuad(subject, DERIVED.terms.template, 'foo');
     metadata.addQuad(subject, DERIVED.terms.template, '{var}');
     await expect(matcher.canHandle({ identifier, subject, metadata })).resolves.toBeUndefined();
-    await expect(matcher.handle({ identifier, subject, metadata })).resolves.toEqual({
+    const result = await matcher.handle({ identifier, subject, metadata });
+    expect(result).toEqual(expect.objectContaining({
+      identifier,
       mappings: { var: 'foo' },
       selectors: [ selector ],
       filter,
-    });
+    }));
+    expect(result.metadata.quads()).toHaveLength(3);
+    expect(result.metadata.identifier).toBe(subject);
   });
 });

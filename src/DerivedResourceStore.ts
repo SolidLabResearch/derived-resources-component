@@ -1,7 +1,10 @@
 import {
   ChangeMap,
   Conditions,
+  getLoggerFor,
+  IdentifierStrategy,
   MethodNotAllowedHttpError,
+  NotFoundHttpError,
   PassthroughStore,
   Patch,
   Representation,
@@ -17,11 +20,15 @@ import { DerivationManager } from './DerivationManager';
  * Prevents writing to a resource if it is a derived resource.
  */
 export class DerivedResourceStore extends PassthroughStore {
-  protected readonly manager: DerivationManager;
+  protected readonly logger = getLoggerFor(this);
 
-  public constructor(source: ResourceStore, manager: DerivationManager) {
+  protected readonly manager: DerivationManager;
+  protected readonly identifierStrategy: IdentifierStrategy;
+
+  public constructor(source: ResourceStore, manager: DerivationManager, identifierStrategy: IdentifierStrategy) {
     super(source);
     this.manager = manager;
+    this.identifierStrategy = identifierStrategy;
   }
 
   public async hasResource(identifier: ResourceIdentifier): Promise<boolean> {
@@ -29,11 +36,34 @@ export class DerivedResourceStore extends PassthroughStore {
     if (exists) {
       return exists;
     }
-    return this.manager.isDerivedResource(identifier);
+    return this.isDerivedResource(identifier, true);
   }
 
   public async getRepresentation(identifier: ResourceIdentifier, preferences: RepresentationPreferences, conditions?: Conditions): Promise<Representation> {
-    return this.manager.handleResource(identifier, conditions);
+    const firstResource = await this.getFirstExistingResource(identifier);
+    this.logger.debug(`${firstResource.metadata.identifier.value} is the first resource that exists starting from ${identifier.path}`);
+    const identifierExists = firstResource.metadata.identifier.value === identifier.path;
+    const config = await this.manager.getDerivationConfig(identifier, firstResource.metadata);
+
+    if (!config && identifierExists) {
+      return firstResource;
+    }
+
+    this.closeDataStream(firstResource);
+
+    if (!config) {
+      throw new NotFoundHttpError();
+    }
+    const result = await this.manager.deriveResource(identifier, config);
+
+    // Reuse metadata if the resource had existing metadata
+    if (identifierExists) {
+      // Removing original content type to prevent duplicates
+      firstResource.metadata.contentType = undefined;
+      result.metadata.setMetadata(firstResource.metadata);
+    }
+
+    return result;
   }
 
   public async addResource(container: ResourceIdentifier, representation: Representation, conditions?: Conditions): Promise<ChangeMap> {
@@ -56,9 +86,62 @@ export class DerivedResourceStore extends PassthroughStore {
     return this.source.deleteResource(identifier, conditions);
   }
 
+  /**
+   * Asserts the identifier does not correspond to a derived resource.
+   */
   protected async assertNotDerived(identifier: ResourceIdentifier): Promise<void> {
-    if (await this.manager.isDerivedResource(identifier)) {
+    if (await this.isDerivedResource(identifier)) {
       throw new MethodNotAllowedHttpError([ 'POST', 'PUT', 'PATCH', 'DELETE' ]);
     }
+  }
+
+  /**
+   * Determines if the identifier corresponds to a derived resource.
+   * `skipFirst` parameter will be passed to `getFirstExistingResource` call.
+   */
+  protected async isDerivedResource(identifier: ResourceIdentifier, skipFirst = false): Promise<boolean> {
+    try {
+      const parent = await this.getFirstExistingResource(identifier, skipFirst);
+      this.closeDataStream(parent);
+      this.logger.debug(`${parent.metadata.identifier.value} is the first resource that exists starting from ${identifier.path}`);
+      const config = await this.manager.getDerivationConfig(identifier, parent.metadata);
+
+      return Boolean(config);
+    } catch (error: unknown) {
+      // Depending on the backend, it is possible that the root container does not exist yet, which could throw an error
+      if (NotFoundHttpError.isInstance(error)) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Finds the first resource in the container chain that exists, starting from the given identifier.
+   * `skipFirst` can be used if you know the input identifier will have no match.
+   */
+  protected async getFirstExistingResource(identifier: ResourceIdentifier, skipFirst = false): Promise<Representation> {
+    try {
+      if (skipFirst) {
+        throw new NotFoundHttpError();
+      }
+      // `await` is important here to make sure the error triggers
+      return await this.source.getRepresentation(identifier, {});
+    } catch(error: unknown) {
+      if (NotFoundHttpError.isInstance(error) && !this.identifierStrategy.isRootContainer(identifier)) {
+        this.logger.debug(`${identifier.path} does not exist, going up the container chain.`);
+        const parent = this.identifierStrategy.getParentContainer(identifier);
+        return this.getFirstExistingResource(parent);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Closes the data stream in the representation, without emitting an error.
+   */
+  protected closeDataStream(representation: Representation): void {
+    representation.data.on('error', () => {});
+    representation.data.destroy();
   }
 }
