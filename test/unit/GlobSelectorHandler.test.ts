@@ -1,9 +1,9 @@
 import { BasicRepresentation, LDP, RepresentationMetadata, ResourceStore } from '@solid/community-server';
-import { GlobSelectorHandler } from '../../src/GlobSelectorHandler';
+import { GlobSelectorParser } from '../../src/selector/GlobSelectorParser';
 
 describe('GlobSelectorHandler', (): void => {
   let store: jest.Mocked<ResourceStore>;
-  let handler: GlobSelectorHandler;
+  let handler: GlobSelectorParser;
   const mappings = {};
 
   beforeEach(async(): Promise<void> => {
@@ -12,7 +12,7 @@ describe('GlobSelectorHandler', (): void => {
       getRepresentation: jest.fn().mockResolvedValue(new BasicRepresentation([], '')),
     } satisfies Partial<ResourceStore> as any;
 
-    handler = new GlobSelectorHandler(store);
+    handler = new GlobSelectorParser(store);
   });
 
   function setMetadata(paths: string[]) {

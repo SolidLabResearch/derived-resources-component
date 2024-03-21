@@ -1,16 +1,23 @@
 import { Term } from '@rdfjs/types';
 import { AsyncHandler, RepresentationMetadata, ResourceIdentifier } from '@solid/community-server';
+import { DerivationConfig } from '../DerivationConfig';
 
 export interface DerivationMatcherInput {
+  /**
+   * The subject that should be used to find derivation triples in the metadata.
+   */
   subject: Term;
+  /**
+   * Identifier of the resource being derived.
+   */
   identifier: ResourceIdentifier;
+  /**
+   * Metadata in which to find the config triples.
+   */
   metadata: RepresentationMetadata;
 }
 
-export interface DerivationConfig {
-  mappings: Record<string, string>;
-  selectors: string[];
-  filter: string;
-}
-
+/**
+ * Extract a matching config from metadata, if one can be found.
+ */
 export abstract class DerivationMatcher extends AsyncHandler<DerivationMatcherInput, DerivationConfig> {}

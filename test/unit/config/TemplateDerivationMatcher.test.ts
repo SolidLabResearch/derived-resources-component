@@ -1,7 +1,7 @@
 import { InternalServerError, NotImplementedHttpError, RepresentationMetadata } from '@solid/community-server';
 import { DataFactory } from 'n3';
-import { TemplateDerivationMatcher } from '../../src/TemplateDerivationMatcher';
-import { DERIVED } from '../../src/Vocabularies';
+import { TemplateDerivationMatcher } from '../../../src/config/TemplateDerivationMatcher';
+import { DERIVED } from '../../../src/Vocabularies';
 import namedNode = DataFactory.namedNode;
 import literal = DataFactory.literal;
 
@@ -57,6 +57,7 @@ describe('TemplateDerivationMatcher', (): void => {
   it('parses the metadata to return a config.', async(): Promise<void> => {
     await expect(matcher.canHandle({ identifier, subject, metadata })).resolves.toBeUndefined();
     await expect(matcher.handle({ identifier, subject, metadata })).resolves.toEqual({
+      identifier,
       mappings: {},
       selectors: [ selector ],
       filter,
@@ -68,6 +69,7 @@ describe('TemplateDerivationMatcher', (): void => {
     metadata.addQuad(subject, DERIVED.terms.template, '{var}');
     await expect(matcher.canHandle({ identifier, subject, metadata })).resolves.toBeUndefined();
     await expect(matcher.handle({ identifier, subject, metadata })).resolves.toEqual({
+      identifier,
       mappings: { var: 'foo' },
       selectors: [ selector ],
       filter,

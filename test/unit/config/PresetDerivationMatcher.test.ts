@@ -1,7 +1,7 @@
 import { NotImplementedHttpError, RepresentationMetadata } from '@solid/community-server';
 import { DataFactory } from 'n3';
-import { DerivationMatcher, DerivationMatcherInput } from '../../src/DerivationMatcher';
-import { PresetDerivationMatcher } from '../../src/PresetDerivationMatcher';
+import { DerivationMatcher, DerivationMatcherInput } from '../../../src/config/DerivationMatcher';
+import { PresetDerivationMatcher } from '../../../src/config/PresetDerivationMatcher';
 import namedNode = DataFactory.namedNode;
 
 describe('PresetDerivationMatcher', (): void => {
@@ -11,7 +11,7 @@ describe('PresetDerivationMatcher', (): void => {
     metadata: new RepresentationMetadata({ path: 'https://example.com/' }),
   };
   let source: jest.Mocked<DerivationMatcher>;
-  let manager: PresetDerivationMatcher
+  let manager: PresetDerivationMatcher;
 
   beforeEach(async(): Promise<void> => {
     source = {

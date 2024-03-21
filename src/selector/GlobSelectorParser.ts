@@ -6,7 +6,7 @@ import {
   ResourceIdentifier,
   ResourceStore
 } from '@solid/community-server';
-import { SelectorHandler, SelectorHandlerInput } from './SelectorHandler';
+import { SelectorParser, SelectorParserInput } from './SelectorParser';
 
 export interface GlobParameters {
   glob: string;
@@ -20,7 +20,7 @@ export interface GlobParameters {
  * The selector can contain glob patterns `*` or `**`.
  * How these are interpreted is based on https://www.digitalocean.com/community/tools/glob.
  */
-export class GlobSelectorHandler extends SelectorHandler {
+export class GlobSelectorParser extends SelectorParser {
   protected readonly logger = getLoggerFor(this);
 
   protected readonly store: ResourceStore;
@@ -30,7 +30,7 @@ export class GlobSelectorHandler extends SelectorHandler {
     this.store = store;
   }
 
-  public async handle({ selector }: SelectorHandlerInput): Promise<ResourceIdentifier[]> {
+  public async handle({ selector }: SelectorParserInput): Promise<ResourceIdentifier[]> {
     return asyncToArray(this.handleSelector(selector));
   }
 

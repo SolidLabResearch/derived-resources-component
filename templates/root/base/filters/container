@@ -4,7 +4,7 @@ PREFIX ldp: <http://www.w3.org/ns/ldp#>
 CONSTRUCT { <$identifier$> ldp:contains ?child }
 WHERE {
   ?s derived:template ?o.
-  BIND(concat("$source$", ?o) as ?childStr).
+  BIND(concat("$source$", encode_for_uri(?o)) as ?childStr).
   BIND(uri(?childStr) as ?child).
   FILTER regex(?childStr, "^$identifier$[^/]+/?$")
 }
