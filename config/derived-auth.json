@@ -8,7 +8,7 @@
     "derived:config/parts/filter.json",
     "derived:config/parts/manager.json",
     "derived:config/parts/query-string.json",
-    "derived:config/parts/selector/default.json",
+    "derived:config/parts/selector/authorized.json",
     "derived:config/parts/store.json"
   ],
   "@graph": [

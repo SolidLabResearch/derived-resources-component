@@ -1,0 +1,59 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^7.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component/^1.0.0/components/context.jsonld"
+  ],
+  "@graph": [
+    {
+      "comment": "This selector handler includes an AuthorizedSelectorParser, thereby enabling the derived:ReadableSources feature.",
+      "@id": "urn:solid-server:default:SelectorHandler",
+      "@type": "BaseSelectorHandler",
+      "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
+      "parser": {
+        "@id": "urn:solid-server:default:AuthorizedSelectorParser",
+        "@type": "AuthorizedSelectorParser",
+        "storage": { "@id": "urn:solid-server:derived:CredentialsStorage" },
+        "source": {
+          "@id": "urn:solid-server:default:GlobSelectorParser",
+          "@type": "GlobSelectorParser",
+          "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" }
+        }
+      }
+    },
+    {
+      "@id": "urn:solid-server:default:PrimaryParallelInitializer",
+      "@type": "ParallelHandler",
+      "handlers": [
+        {
+          "comment": "Set the PermissionReader through an initializer to prevent constructor loops.",
+          "@type" : "ParamInitializer",
+          "paramSetter": { "@id": "urn:solid-server:default:AuthorizedSelectorParser" },
+          "param": { "@id": "urn:solid-server:default:PermissionReader" }
+        }
+      ]
+    },
+
+    {
+      "comment": "Override the existing authorizer so requests first go through our cache authorizer.",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:Authorizer" },
+      "overrideParameters": {
+        "@type": "SequenceHandler",
+        "handlers": [
+          {
+            "@id": "urn:solid-server:derived:StoreCredentialsAuthorizer",
+            "@type": "StoreCredentialsAuthorizer",
+            "storage": {
+              "@id": "urn:solid-server:derived:CredentialsStorage",
+              "@type": "WeakStorage"
+            }
+          },
+          {
+            "@type": "PermissionBasedAuthorizer",
+            "resourceSet": { "@id": "urn:solid-server:default:CachedResourceSet" }
+          }
+        ]
+      }
+    }
+  ]
+}

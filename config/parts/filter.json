@@ -1,0 +1,35 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^7.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component/^1.0.0/components/context.jsonld"
+  ],
+  "@graph": [
+    {
+      "@id": "urn:solid-server:default:FilterHandler",
+      "@type": "BaseFilterHandler",
+      "parser": {
+        "@id": "urn:solid-server:default:FilterParser",
+        "@type": "StringResourceFilterParser",
+        "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
+        "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" }
+      },
+      "executor": {
+        "@id": "urn:solid-server:default:FilterExecutor",
+        "@type": "MappingFilterExecutor",
+        "source": {
+          "@id": "urn:solid-server:default:FilterExecutorHandler",
+          "@type": "WaterfallHandler",
+          "handlers": [
+            {
+              "@type": "IndexFilterExecutor"
+            },
+            {
+              "@type": "RdfFilterExecutor",
+              "source": { "@type": "SparqlFilterExecutor" }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

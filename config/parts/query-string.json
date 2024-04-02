@@ -1,0 +1,20 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^7.0.0/components/context.jsonld"
+  ],
+  "@graph": [
+    {
+      "comment": [
+        "Keep query parameters in identifiers.",
+        "This makes it so that any query parameters can cause issues with normal resources so do not enable this on a standard long-running server."
+      ],
+      "@id": "urn:solid-server:derived:TargetExtractorOverride",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:TargetExtractor" },
+      "overrideParameters": {
+        "@type": "OriginalUrlExtractor",
+        "includeQueryString": true
+      }
+    }
+  ]
+}
