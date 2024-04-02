@@ -1,0 +1,9 @@
+@prefix acl: <http://www.w3.org/ns/auth/acl#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+
+# Give all agents Read, Write, and Control permissions on everything
+<#authorization>
+    a               acl:Authorization;
+    acl:agent       <http://example.com/alice>;
+    acl:mode        acl:Read;
+    acl:accessTo    <./alice>.

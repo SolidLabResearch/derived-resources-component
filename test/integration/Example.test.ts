@@ -17,7 +17,7 @@ describe('The server test setup', (): void => {
         config: [
           joinFilePath(__dirname, '../../config/example.json'),
           joinFilePath(__dirname, '../../config/derived.json'),
-          '@css:config/default.json',
+          joinFilePath(__dirname, '../../config/main.json'),
         ],
         loaderProperties: {
           mainModulePath: joinFilePath(__dirname, '../../'),

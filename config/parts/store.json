@@ -1,0 +1,35 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^7.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component/^1.0.0/components/context.jsonld"
+  ],
+  "@graph": [
+    {
+      "comment": "A second converting store to put in front of our new store.",
+      "@id": "urn:solid-server:derived:RepresentationConvertingStore",
+      "@type": "RepresentationConvertingStore",
+      "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" },
+      "options_inConverter": { "@id": "urn:solid-server:default:RepresentationConverter" },
+      "options_outConverter": { "@id": "urn:solid-server:default:UiEnabledConverter" },
+      "source": { "@id":  "urn:solid-server:derived:DerivedResourceStore" }
+    },
+    {
+      "comment": "The store responsible for generating derived resources.",
+      "@id": "urn:solid-server:derived:DerivedResourceStore",
+      "@type": "DerivedResourceStore",
+      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+      "source": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
+      "manager": { "@id": "urn:solid-server:derived:DerivationManager" }
+    },
+    {
+      "comment": "Insert our new stores in the stack of stores, between the locking and patching store.",
+      "@id": "urn:solid-server:derived:LockStoreOverride",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:ResourceStore_Locking" },
+      "overrideParameters": {
+        "@type": "LockingResourceStore",
+        "source": { "@id": "urn:solid-server:derived:RepresentationConvertingStore" }
+      }
+    }
+  ]
+}

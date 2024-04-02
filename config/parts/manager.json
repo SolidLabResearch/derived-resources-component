@@ -1,0 +1,17 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component/^1.0.0/components/context.jsonld"
+  ],
+  "@graph": [
+    {
+      "@id": "urn:solid-server:derived:DerivationManager",
+      "@type": "BaseDerivationManager",
+      "derivationMatcher": {
+        "@type": "PresetDerivationMatcher",
+        "source": { "@type": "TemplateDerivationMatcher" }
+      },
+      "selectorHandler": { "@id": "urn:solid-server:default:SelectorHandler" },
+      "filterHandler": { "@id": "urn:solid-server:default:FilterHandler" }
+    }
+  ]
+}
