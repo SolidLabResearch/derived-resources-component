@@ -53,9 +53,6 @@ defines `http://localhost:3000/test` as a derived resource.
 The contents are defined by using `http://localhost:3000/data`
 as an input for the query found at `http://localhost:3000/filter`.
 
-The last modified date, and the resulting ETag, of the derived resource
-is that of the most recently changed selector.
-
 Below are some more details on each of the fields.
 
 ### Template
@@ -143,3 +140,11 @@ More info on these can be found [here](derived-index.md).
 - The filter could be extended to also support external URIs.
 - To make URI templates with query parameters work, query parameters are not stripped from incoming URLs.
   For standard, non-derived, resources this can cause issues if an unexpected query parameter is part of the URL.
+- The last modified timestamp of a derived resource will always be the current time, this to make sure its ETag always changes.
+  Otherwise, we would have to determine the ETag on:
+  - The timestamp of all input resources.
+  - The timestamp of the filters.
+  - The mappings used.
+  - Which resources were used to generate the resource, as those could be different due to changing permissions.
+
+  As ETags in the CSS are currently purely based on the timestamp this would require some changes there first.

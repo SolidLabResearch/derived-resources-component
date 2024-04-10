@@ -1,5 +1,4 @@
-import { Term } from '@rdfjs/types';
-import { DC, Representation, RepresentationMetadata, updateModifiedDate } from '@solid/community-server';
+import { Representation, updateModifiedDate } from '@solid/community-server';
 import { FilterExecutor } from './FilterExecutor';
 import { FilterHandler, FilterHandlerInput } from './FilterHandler';
 import { FilterParser } from './FilterParser';
@@ -28,27 +27,15 @@ export class BaseFilterHandler extends FilterHandler {
     const filter = await this.parser.handle(input.config);
     const result = await this.executor.handleSafe({ ...input, filter });
 
-    this.setLastModified(result.metadata, input.representations);
+    // Set the last modified date to the current time, this to prevent issues with ETags not changing if the resource changes.
+    // To generate a correct ETag we would have to consider all input sources, their timestamps, same for the filter, and potential mappings.
+    // CSS currently generates an ETag purely based on the timestamp so some changes would be needed there before we can even think of that.
+    updateModifiedDate(result.metadata, new Date());
 
     // Add all the derivation metadata
     input.config.metadata.identifier = result.metadata.identifier;
     result.metadata.setMetadata(input.config.metadata);
 
     return result;
-  }
-
-  /**
-   * Sets the last-modified date of the resulting derived resource to that of the highest value in the sources.
-   */
-  protected setLastModified(resultMetadata: RepresentationMetadata, sourceRepresentations: Representation[]): void {
-    const modifiedTimes = sourceRepresentations
-      .map((representation): Term | undefined => representation.metadata.get(DC.terms.modified))
-      .filter(Boolean)
-      .map((term): number => new Date(term!.value).getTime())
-    const lastModified = Math.max(...modifiedTimes);
-    // Will be -Infinity if there were no matches
-    if (lastModified > 0) {
-      updateModifiedDate(resultMetadata, new Date(lastModified));
-    }
   }
 }

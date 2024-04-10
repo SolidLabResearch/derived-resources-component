@@ -56,14 +56,13 @@ describe('BaseFilterHandler', (): void => {
     await expect(handler.canHandle(input)).rejects.toThrow(error);
   });
 
-  it('adds the timestamp and config metadata to the resulting representation.', async(): Promise<void> => {
+  it('adds the config metadata to the resulting representation.', async(): Promise<void> => {
     input.config.metadata.add(DERIVED.terms.template, 'foo');
     input.config.metadata.add(DERIVED.terms.selector, 'selector');
     input.config.metadata.add(DERIVED.terms.filter, 'filter');
 
     let result = await handler.handle(input);
     expect(result).toBe(representation);
-    expect(result.metadata.get(DC.terms.modified)?.value).toBe(date2.toISOString());
     expect(result.metadata.get(DERIVED.terms.selector)?.value).toBe('selector');
     expect(result.metadata.get(DERIVED.terms.filter)?.value).toBe('filter');
     expect(executor.handleSafe).toHaveBeenLastCalledWith({ ...input, filter });
