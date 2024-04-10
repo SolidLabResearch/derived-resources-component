@@ -1,6 +1,7 @@
 import {
   ChangeMap,
   Conditions,
+  DC,
   getLoggerFor,
   IdentifierStrategy,
   MethodNotAllowedHttpError,
@@ -60,6 +61,8 @@ export class DerivedResourceStore extends PassthroughStore {
     if (identifierExists) {
       // Removing original content type to prevent duplicates
       firstResource.metadata.contentType = undefined;
+      // Don't want to use the existing timestamp
+      firstResource.metadata.removeAll(DC.terms.modified);
       result.metadata.setMetadata(firstResource.metadata);
     }
 
