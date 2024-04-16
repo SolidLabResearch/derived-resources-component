@@ -4,6 +4,7 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component/^1.0.0/components/context.jsonld"
   ],
   "import": [
+    "derived:config/parts/cache.json",
     "derived:config/parts/disable-index.json",
     "derived:config/parts/filter.json",
     "derived:config/parts/manager.json",

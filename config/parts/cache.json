@@ -1,0 +1,23 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solid/community-server/^7.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component/^1.0.0/components/context.jsonld"
+  ],
+  "@graph": [
+    {
+      "comment": "Insert the cache right before the DataAccessorBasedStore.",
+      "@id": "urn:solid-server:derived:CacheStoreOverride",
+      "@type": "Override",
+      "overrideInstance": { "@id": "urn:solid-server:default:ResourceStore_Converting" },
+      "overrideParameters": {
+        "@type": "RepresentationConvertingStore",
+        "source": {
+          "@id": "urn:solid-server:derived:CachedResourceStore",
+          "@type": "CachedResourceStore",
+          "source": { "@id": "urn:solid-server:default:ResourceStore_Backend" },
+          "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" }
+        }
+      }
+    }
+  ]
+}

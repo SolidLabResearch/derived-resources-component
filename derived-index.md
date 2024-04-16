@@ -92,6 +92,18 @@ The previous example would only show the examples everyone has read access to.
 If you perform the GET request and add the header `Authorization: WebID http://example.com/alice`,
 you will see more results.
 
+## Caching
+
+Besides the caching already present for all derived resources,
+there is also some specific caching for derived index resources.
+For every resource that is used to generate an index,
+the server caches the matching quads that resource had for the filter.
+This way, if new resources get included in the index generation,
+due to using different credentials for example,
+the results of the ones previously included can be reused.
+Similar to standard caching for derived resources,
+the timestamp of the resource is used to make sure outdated data is not used.
+
 ## CSS architecture workarounds
 
 While it was possible to implement these new features without having to make any changes to the CSS,
@@ -128,8 +140,3 @@ To prevent this,
 some of the dependencies are applied after initialization.
 The `ParamSetter` interface and `ParamInitializer` class have been created specifically for this purpose.
 An example of this issue can be seen in the `AuthorizedSelectorParser`.
-
-## Known issues
-
-The same issues as the original derived resources apply here.
-The lack of caching might be more impactful here as generally there will be more input resources.

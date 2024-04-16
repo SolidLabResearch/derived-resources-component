@@ -17,17 +17,28 @@
         "@id": "urn:solid-server:default:FilterExecutor",
         "@type": "MappingFilterExecutor",
         "source": {
-          "@id": "urn:solid-server:default:FilterExecutorHandler",
-          "@type": "WaterfallHandler",
-          "handlers": [
-            {
-              "@type": "IndexFilterExecutor"
-            },
-            {
-              "@type": "RdfFilterExecutor",
-              "source": { "@type": "SparqlFilterExecutor" }
-            }
-          ]
+          "@id": "urn:solid-server:default:CachedFilterExecutor",
+          "@type": "CachedFilterExecutor",
+          "source": {
+            "@id": "urn:solid-server:default:FilterExecutorHandler",
+            "@type": "WaterfallHandler",
+            "handlers": [
+              {
+                "@id": "urn:solid-server:default:IndexFilterExecutor",
+                "@type": "IndexFilterExecutor",
+                "resourceIndexParser": {
+                  "@id": "urn:solid-server:default:CachedResourceIndexParser",
+                  "@type": "CachedQuadFilterParser",
+                  "source": { "@type": "BaseQuadFilterParser" }
+                }
+              },
+              {
+                "@id": "urn:solid-server:default:RdfFilterExecutor",
+                "@type": "RdfFilterExecutor",
+                "source": { "@type": "SparqlFilterExecutor" }
+              }
+            ]
+          }
         }
       }
     }
