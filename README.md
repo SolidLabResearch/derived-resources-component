@@ -53,6 +53,9 @@ defines `http://localhost:3000/test` as a derived resource.
 The contents are defined by using `http://localhost:3000/data`
 as an input for the query found at `http://localhost:3000/filter`.
 
+The last modified date, and the resulting ETag, of the derived resource
+is that of the most recently changed selector.
+
 Below are some more details on each of the fields.
 
 ### Template
@@ -122,10 +125,33 @@ The query can be seen at `http://localhost:3000/filters/container`.
 A new feature that was added at a later point was support for derived index resources.
 More info on these can be found [here](derived-index.md).
 
+## Caching
+
+A new `ResourceStore` is added in this component: the `CachedResourceStore`.
+This store caches resources in an LRU cache and invalidates them when they are modified.
+This is a memory-based cache, meaning this can not be used by servers with worker threads,
+and is interesting for servers using non-memory backends, such as a file backend.
+This will make it so the input sources can be requested faster.
+But this will make it so the input sources can be requested faster.
+This class is independent of the derived resources so could move to the main CSS repo.
+
+For derived resources caching is a bit more complicated as they have to be updated when any of their input sources change.
+The amount of input sources might also change,
+if a wildcard selector is used.
+To store the resulting representations in an LRU cache,
+a key is generated which is based on
+1. the filter,
+2. the identifiers of all input resources,
+3. and the timestamps of all those input resources.
+
+This way, if any of those changes, the stored cache entry will never be used again,
+preventing invalid data.
+The disadvantage is that this data is never explicitly invalidated,
+so it stays in the cache until it gets dropped because the cache is full.
+
 ## Known limitations/decisions
 
 - No locks are used when reading data from the selectors. This is to prevent potential deadlocks.
-- There is no caching, so derived resources are generated from scratch on every request.
 - Authorization on the selector resources is ignored.
   Note that this allows users to access data they do not have access to if they guess the URL of such data.
   We might want to implement it so creating a derived resource requires read access on all selectors,
@@ -140,11 +166,3 @@ More info on these can be found [here](derived-index.md).
 - The filter could be extended to also support external URIs.
 - To make URI templates with query parameters work, query parameters are not stripped from incoming URLs.
   For standard, non-derived, resources this can cause issues if an unexpected query parameter is part of the URL.
-- The last modified timestamp of a derived resource will always be the current time, this to make sure its ETag always changes.
-  Otherwise, we would have to determine the ETag on:
-  - The timestamp of all input resources.
-  - The timestamp of the filters.
-  - The mappings used.
-  - Which resources were used to generate the resource, as those could be different due to changing permissions.
-
-  As ETags in the CSS are currently purely based on the timestamp this would require some changes there first.

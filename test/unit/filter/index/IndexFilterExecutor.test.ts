@@ -1,24 +1,36 @@
 import {
-  asyncToArray,
   BasicRepresentation,
   CONTENT_TYPE,
+  guardedStreamFrom,
   INTERNAL_QUADS,
   NotImplementedHttpError,
+  readableToQuads,
   RepresentationMetadata
 } from '@solid/community-server';
-import { DataFactory, Store } from 'n3';
-import { FilterExecutorInput } from '../../../src/filter/FilterExecutor';
-import { IndexFilterExecutor } from '../../../src/filter/IndexFilterExecutor';
-import { DERIVED_INDEX } from '../../../src/Vocabularies';
+import { DataFactory } from 'n3';
+import { FilterExecutorInput } from '../../../../src/filter/FilterExecutor';
+import { IndexFilterExecutor } from '../../../../src/filter/idx/IndexFilterExecutor';
+import { QuadFilterParser } from '../../../../src/filter/idx/QuadFilterParser';
+import { DERIVED_INDEX } from '../../../../src/Vocabularies';
 
 describe('IndexFilterExecutor', (): void => {
   const subject = DataFactory.namedNode('subject');
   const typeNode = DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
-  const otherNode = DataFactory.namedNode('http://xmlns.com/foaf/0.1/topic');
   const type1 = DataFactory.namedNode('http://xmlns.com/foaf/0.1/Agent');
   const type2 = DataFactory.namedNode('http://xmlns.com/foaf/0.1/Person');
   const id1 = DataFactory.namedNode('http://example.com/res1');
   const id2 = DataFactory.namedNode('http://example.com/res2');
+  const filter = {
+    predicate: {
+      termType: 'NamedNode',
+      value: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+    },
+    object: {
+      termType: 'Variable',
+      value: 'v'
+    }
+  };
+  let resourceIndexParser: jest.Mocked<QuadFilterParser>;
   let input: FilterExecutorInput;
   let executor: IndexFilterExecutor;
 
@@ -26,15 +38,10 @@ describe('IndexFilterExecutor', (): void => {
     const quads1 = [
       DataFactory.quad(subject, typeNode, type1),
       DataFactory.quad(subject, typeNode, type2),
-      DataFactory.quad(subject, otherNode, type1),
     ];
     const quads2 = [
       DataFactory.quad(subject, typeNode, type1),
-      DataFactory.quad(subject, otherNode, type1),
     ];
-
-    const metadata1 = new RepresentationMetadata(id1, { [CONTENT_TYPE]: INTERNAL_QUADS });
-    const metadata2 = new RepresentationMetadata(id2, { [CONTENT_TYPE]: INTERNAL_QUADS });
 
     input = {
       config: {
@@ -45,25 +52,26 @@ describe('IndexFilterExecutor', (): void => {
         metadata: new RepresentationMetadata(),
       },
       filter: {
-        data: `{
-                "predicate": {
-                  "termType": "NamedNode",
-                  "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-                },
-                "object": {
-                  "termType": "Variable",
-                  "value": "v"
-                }
-              }`,
+        data: JSON.stringify(filter),
         metadata: new RepresentationMetadata({ [CONTENT_TYPE]: 'application/json' }),
       },
       representations: [
-        new BasicRepresentation(quads1, metadata1),
-        new BasicRepresentation(quads2, metadata2),
+        new BasicRepresentation([], id1),
+        new BasicRepresentation([], id2),
       ],
     }
 
-    executor = new IndexFilterExecutor();
+    resourceIndexParser = {
+      canHandle: jest.fn(),
+      handle: jest.fn(async({ representation }) => {
+        if (representation.metadata.identifier.equals(id1)) {
+          return guardedStreamFrom(quads1);
+        }
+        return guardedStreamFrom(quads2);
+      }),
+    } satisfies Partial<QuadFilterParser> as any;
+
+    executor = new IndexFilterExecutor(resourceIndexParser);
   });
 
   it('requires JSON.', async(): Promise<void> => {
@@ -82,28 +90,31 @@ describe('IndexFilterExecutor', (): void => {
   });
 
   it('rejects quads that do not have exactly 1 variable.', async(): Promise<void> => {
-    input.filter.data = `{
-                "predicate": {
-                  "termType": "Variable",
-                  "value": "v1"
-                },
-                "object": {
-                  "termType": "Variable",
-                  "value": "v2"
-                }
-              }`;
+    input.filter.data = JSON.stringify({
+      predicate: {
+        termType: 'Variable',
+        values: 'v1'
+      },
+      object: {
+        termType: 'Variable',
+        values: 'v2'
+      }
+    });
     await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
   });
 
-  it('accepts everything else.', async(): Promise<void> => {
+  it('requires the ResourceIndexParser to accept all representations.', async(): Promise<void> => {
     await expect(executor.canHandle(input)).resolves.toBeUndefined();
+    expect(resourceIndexParser.canHandle).toHaveBeenCalledTimes(2);
+    expect(resourceIndexParser.canHandle).toHaveBeenNthCalledWith(1, { filter, representation: input.representations[0] });
+    expect(resourceIndexParser.canHandle).toHaveBeenNthCalledWith(2, { filter, representation: input.representations[1] });
   });
 
   it('generates the correct triples based on the input streams.', async(): Promise<void> => {
     const result = await executor.handle(input);
     expect(result.metadata.identifier.value).toBe(input.config.identifier.path);
     expect(result.metadata.contentType).toBe(INTERNAL_QUADS);
-    const store = new Store(await asyncToArray(result.data));
+    const store = await readableToQuads(result.data);
 
     const sub1 = store.getSubjects(DERIVED_INDEX.terms.for, type1, null);
     const sub2 = store.getSubjects(DERIVED_INDEX.terms.for, type2, null);

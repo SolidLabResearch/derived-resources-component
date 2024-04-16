@@ -6,13 +6,18 @@ export * from './credentials/CredentialsStorage';
 export * from './credentials/StoreCredentialsAuthorizer';
 export * from './credentials/WeakStorage';
 
+export * from './filter/idx/BaseQuadFilterParser';
+export * from './filter/idx/CachedQuadFilterParser';
+export * from './filter/idx/IndexFilterExecutor';
+export * from './filter/idx/QuadFilterParser';
+
 export * from './filter/BaseFilterHandler';
+export * from './filter/CachedFilterExecutor';
 export * from './filter/RdfFilterExecutor';
 export * from './filter/Filter';
 export * from './filter/FilterExecutor';
 export * from './filter/FilterHandler';
 export * from './filter/FilterParser';
-export * from './filter/IndexFilterExecutor';
 export * from './filter/MappingFilterExecutor';
 export * from './filter/N3FilterExecutor';
 export * from './filter/SparqlFilterExecutor';
@@ -27,8 +32,11 @@ export * from './selector/GlobSelectorParser';
 export * from './selector/SelectorHandler';
 export * from './selector/SelectorParser';
 
+export * from './util/CacheUtil';
+
+export * from './BaseDerivationManager';
+export * from './CachedResourceStore';
 export * from './DerivationConfig';
 export * from './DerivationManager';
 export * from './DerivedResourceStore';
-export * from './BaseDerivationManager';
 export * from './Vocabularies';

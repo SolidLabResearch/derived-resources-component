@@ -2,16 +2,19 @@ import { BlankNode, Quad, Quad_Object, Term } from '@rdfjs/types';
 import {
   BasicRepresentation,
   INTERNAL_QUADS,
-  NotImplementedHttpError, PREFERRED_PREFIX_TERM,
-  Representation, SOLID_META,
+  NotImplementedHttpError,
+  PREFERRED_PREFIX_TERM,
+  Representation,
+  SOLID_META,
   transformSafely
 } from '@solid/community-server';
 import { DataFactory, Store } from 'n3';
 import { PassThrough, Readable } from 'node:stream';
-import { DERIVED_INDEX } from '../Vocabularies';
-import { FilterExecutor, FilterExecutorInput } from './FilterExecutor';
+import { DERIVED_INDEX } from '../../Vocabularies';
+import { FilterExecutor, FilterExecutorInput } from '../FilterExecutor';
+import { QuadFilterParser } from './QuadFilterParser';
 
-const EXPECTED_KEYS = [ 'subject', 'predicate', 'object', 'graph' ];
+const EXPECTED_KEYS = [ 'subject', 'predicate', 'object', 'graph' ] as const;
 
 /**
  * A {@link FilterExecutor} that generates derived index resources.
@@ -22,7 +25,14 @@ const EXPECTED_KEYS = [ 'subject', 'predicate', 'object', 'graph' ];
  * and which value was in the variable position.
  */
 export class IndexFilterExecutor extends FilterExecutor {
-  public async canHandle({ filter }: FilterExecutorInput): Promise<void> {
+  protected readonly resourceIndexParser: QuadFilterParser;
+
+  public constructor(resourceIndexParser: QuadFilterParser) {
+    super();
+    this.resourceIndexParser = resourceIndexParser;
+  }
+
+  public async canHandle({ filter, representations }: FilterExecutorInput): Promise<void> {
     if (filter.metadata.contentType !== 'application/json') {
       throw new NotImplementedHttpError('Only application/json filters are supported.');
     }
@@ -32,7 +42,7 @@ export class IndexFilterExecutor extends FilterExecutor {
     }
 
     const json = JSON.parse(filter.data);
-    if (!Object.keys(json).every((key): boolean => EXPECTED_KEYS.includes(key))) {
+    if (!Object.keys(json).every((key): boolean => (EXPECTED_KEYS as readonly string[]).includes(key))) {
       throw new NotImplementedHttpError('Expected a json object with keys subject, predicate, object and/or graph.');
     }
 
@@ -46,21 +56,33 @@ export class IndexFilterExecutor extends FilterExecutor {
     if (varCount !== 1) {
       throw new NotImplementedHttpError('Expected exactly 1 variable in the filter.');
     }
+
+    for (const representation of representations) {
+      await this.resourceIndexParser.canHandle({ filter: json, representation });
+    }
   }
 
   public async handle(input: FilterExecutorInput): Promise<Representation> {
     const filter = JSON.parse(input.filter.data as string) as Partial<Quad>;
+
+    // Find the variable
+    let position: typeof EXPECTED_KEYS[number];
+    for (const key of EXPECTED_KEYS) {
+      if ((filter[key] as Term | undefined)?.termType === 'Variable') {
+        position = key;
+      }
+    }
 
     // We create a new store every time to reset the blank node index value
     const store = new Store();
     // We link blank nodes to matches to group all entries of the same match
     const matches: Record<string, BlankNode> = {};
 
-    const streams = input.representations.map((representation): Readable => {
-      const createQuads = this.createQuadFn(store, matches, representation.metadata.identifier);
-      const matchFn = this.createMatchFn(filter, createQuads);
-      return this.createTransform(representation.data, matchFn);
-    });
+    const streams = await Promise.all(input.representations.map(async(representation): Promise<Readable> => {
+      const createQuads = this.createQuadFn(position, store, matches, representation.metadata.identifier);
+      const data = await this.resourceIndexParser.handle({ representation, filter });
+      return this.createTransform(data, createQuads);
+    }));
     const merged = this.mergeStreams(streams);
 
     const representation = new BasicRepresentation(merged, input.config.identifier, INTERNAL_QUADS);
@@ -69,58 +91,30 @@ export class IndexFilterExecutor extends FilterExecutor {
     return representation;
   }
 
-  protected createQuadFn(store: Store, matches: Record<string, BlankNode>, instance: Quad_Object): (match?: Quad_Object) => Quad[] {
-    const cache = new Set<string>();
-    return (match?: Quad_Object): Quad[] => {
-      if (!match) {
-        return [];
-      }
-      let existingNode = matches[match.value];
+  protected createQuadFn(position: typeof EXPECTED_KEYS[number], store: Store, matches: Record<string, BlankNode>, instance: Quad_Object): (quad: Quad) => Quad[] {
+    return (quad: Quad): Quad[] => {
+      let existingNode = matches[quad[position].value];
       if (existingNode) {
-        // If this node is in the cache the relevant triples already exist
-        if (cache.has(existingNode.value)) {
-          return [];
-        }
-        cache.add(existingNode.value);
-
-        // In case we already have a match the `for` triple has already been generated
+        // If we already have a match, the `derived-index:for` triple has already been generated
         return [
           DataFactory.quad(existingNode, DataFactory.namedNode(DERIVED_INDEX.instance), instance)
         ];
       }
       const blankNode = store.createBlankNode();
-      matches[match.value] = blankNode;
-      cache.add(blankNode.value);
+      matches[quad[position].value] = blankNode;
 
       return [
-        DataFactory.quad(blankNode, DataFactory.namedNode(DERIVED_INDEX.for), match),
+        DataFactory.quad(blankNode, DataFactory.namedNode(DERIVED_INDEX.for), quad[position] as Quad_Object),
         DataFactory.quad(blankNode, DataFactory.namedNode(DERIVED_INDEX.instance), instance),
       ];
     }
   }
 
-  protected createMatchFn(filter: Partial<Quad>, createQuads: (match?: Quad_Object) => Quad[]): (quad: Quad) => Quad[] {
-    return (quad: Quad): Quad[] => {
-      let match: Quad_Object | undefined;
-      for (const pos of [ 'subject', 'predicate', 'object' ] as const) {
-        if (filter[pos]) {
-          if (filter[pos]?.termType === 'Variable') {
-            match = quad[pos];
-          } else if (!quad[pos].equals(filter[pos])) {
-            return [];
-          }
-        }
-      }
-
-      return createQuads(match);
-    };
-  }
-
-  protected createTransform(data: Readable, matchFn: (quad: Quad) => Quad[]): Readable {
+  protected createTransform(data: Readable, quadFn: (quad: Quad) => Quad[]): Readable {
     const transformed = transformSafely(data, {
       transform: (data: Quad) => {
-        for (const match of matchFn(data)) {
-          transformed.push(match);
+        for (const quads of quadFn(data)) {
+          transformed.push(quads);
         }
       },
       objectMode: true,
