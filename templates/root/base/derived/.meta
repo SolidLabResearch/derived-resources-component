@@ -1,0 +1,50 @@
+@prefix derived: <urn:npm:solid:derived-resources:> .
+
+<>
+    derived:derivedResource [
+        derived:template "test";
+        derived:selector <../data/data>;
+        derived:filter <../filters/name>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "";
+        derived:selector <.meta>;
+        derived:filter <../filters/container>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "template/";
+        derived:selector <.meta>;
+        derived:filter <../filters/container>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "template/{var}.ttl";
+        derived:selector <../data/data>;
+        derived:filter <../filters/var>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "query{?var}";
+        derived:selector <../data/data>;
+        derived:filter <../filters/var>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "pattern";
+        derived:selector <../data/container/*>;
+        derived:filter <../filters/name>
+    ].
+
+<>
+    derived:derivedResource [
+        derived:template "multiple";
+        derived:selector <../data/container/data1>, <../data/container/data2>;
+        derived:filter <../filters/name>
+    ].

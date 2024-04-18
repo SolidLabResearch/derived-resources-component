@@ -1,18 +1,18 @@
 @prefix derived: <urn:npm:solid:derived-resources:> .
 
-<> a <http://www.w3.org/ns/pim/space#Storage>;
+<>
     derived:derivedResource [
         derived:template "type";
-        derived:selector <data/**>;
-        derived:filter <filters/type.json>;
+        derived:selector <../data/auth/**>;
+        derived:filter <../filters/type.json>;
         derived:feature derived:ReadableSources
     ].
 
 <>
     derived:derivedResource [
         derived:template "predicate";
-        derived:selector <data/**>;
-        derived:filter <filters/predicate.json>;
+        derived:selector <../data/auth/**>;
+        derived:filter <../filters/predicate.json>;
         derived:feature derived:ReadableSources
     ].
 
@@ -20,5 +20,5 @@
     derived:derivedResource [
         derived:template "";
         derived:selector <.meta>;
-        derived:filter <filters/container>
+        derived:filter <../filters/container>
     ].

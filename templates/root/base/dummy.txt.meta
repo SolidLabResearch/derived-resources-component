@@ -3,6 +3,6 @@
 <> <http://www.w3.org/ns/ma-ont#format> "text/plain";
     derived:derivedResource [
         derived:template "";
-        derived:selector <selectors/data>;
+        derived:selector <data/data>;
         derived:filter <filters/name>
     ].

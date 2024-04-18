@@ -75,18 +75,18 @@ a new `derived:feature` triple can be added to the metadata defining the derived
 
 ## Example
 
-A server with example derived index resources can be started by running `npm run start:example:index`.
-Which files are used for this can be seen in the
-[`templates/index/base` folder](https://github.com/SolidLabResearch/derived-resources-component/tree/main/templates/index/base).
+When starting the server with `npm run start:example`,
+several index related examples will also be created.
+The metadata for these can be seen in <http://localhost:3000/index/.meta>.
 
-Two derived resources are created in the root container,
-both of these applied to the data in the `http://localhost:3000/data` container.
+Two derived resources are created,
+both of these applied to the data in the <http://localhost:3000/data/auth> container.
 
-* `http://localhost:3000/predicate` provides an index of all predicates.
-* `http://localhost:3000/type` provides an index of all `rdf:type` objects.
+* <http://localhost:3000/index/predicate> provides an index of all predicates.
+* <http://localhost:3000/index/type> provides an index of all `rdf:type` objects.
 
 One of the two documents in the `data` container only provides read acces to the WebID `http://example.com/alice`.
-The server has been configured so you can authenticate as a user simply by adding the WebID to the authorization header,
+The server has been configured so that you can authenticate as a user by adding the WebID to the authorization header,
 to make it easier to test this out.
 The previous example would only show the examples everyone has read access to.
 If you perform the GET request and add the header `Authorization: WebID http://example.com/alice`,
