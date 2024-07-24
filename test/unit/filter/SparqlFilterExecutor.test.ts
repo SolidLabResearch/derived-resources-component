@@ -2,10 +2,10 @@ import {
   INTERNAL_QUADS,
   NotImplementedHttpError,
   readableToQuads,
-  RepresentationMetadata
+  RepresentationMetadata,
 } from '@solid/community-server';
 import { DataFactory, Store } from 'n3';
-import { N3FilterExecutorInput } from '../../../src/filter/N3FilterExecutor';
+import type { N3FilterExecutorInput } from '../../../src/filter/N3FilterExecutor';
 import { SparqlFilterExecutor } from '../../../src/filter/SparqlFilterExecutor';
 import literal = DataFactory.literal;
 import namedNode = DataFactory.namedNode;
@@ -35,8 +35,8 @@ describe('SparqlFilterExecutor', (): void => {
             ?s foaf:name ?o.
           }`,
         metadata: new RepresentationMetadata('application/sparql-query'),
-      }
-    }
+      },
+    };
   });
 
   it('can only handle SPARQL query filters.', async(): Promise<void> => {

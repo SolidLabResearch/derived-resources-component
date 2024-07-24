@@ -1,7 +1,8 @@
-import { AsyncHandler, Representation } from '@solid/community-server';
-import { Store } from 'n3';
-import { DerivationConfig } from '../DerivationConfig';
-import { Filter } from './Filter';
+import type { Representation } from '@solid/community-server';
+import { AsyncHandler } from '@solid/community-server';
+import type { Store } from 'n3';
+import type { DerivationConfig } from '../DerivationConfig';
+import type { Filter } from './Filter';
 
 export interface N3FilterExecutorInput<T = unknown> {
   /**

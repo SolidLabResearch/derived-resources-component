@@ -1,15 +1,17 @@
+import type {
+  Representation,
+  RepresentationMetadata,
+  ResourceIdentifier,
+} from '@solid/community-server';
 import {
   createErrorMessage,
   getLoggerFor,
-  Representation,
-  RepresentationMetadata,
-  ResourceIdentifier
 } from '@solid/community-server';
-import { DerivationMatcher } from './config/DerivationMatcher';
-import { DerivationConfig } from './DerivationConfig';
-import { DerivationManager } from './DerivationManager';
-import { FilterHandler } from './filter/FilterHandler';
-import { SelectorHandler } from './selector/SelectorHandler';
+import type { DerivationMatcher } from './config/DerivationMatcher';
+import type { DerivationConfig } from './DerivationConfig';
+import type { DerivationManager } from './DerivationManager';
+import type { FilterHandler } from './filter/FilterHandler';
+import type { SelectorHandler } from './selector/SelectorHandler';
 import { DERIVED } from './Vocabularies';
 
 interface MetadataDerivationManagerArgs {
@@ -40,12 +42,13 @@ export class BaseDerivationManager implements DerivationManager {
   /**
    * Finds the derivation triples in the given metadata that correspond to the given identifier, if any.
    */
-  public async getDerivationConfig(identifier: ResourceIdentifier, metadata: RepresentationMetadata): Promise<DerivationConfig | undefined> {
+  public async getDerivationConfig(identifier: ResourceIdentifier, metadata: RepresentationMetadata):
+  Promise<DerivationConfig | undefined> {
     const derived = metadata.getAll(DERIVED.terms.derivedResource);
 
     for (const subject of derived) {
       try {
-        return await this.derivationMatcher.handleSafe({ identifier, metadata, subject })
+        return await this.derivationMatcher.handleSafe({ identifier, metadata, subject });
       } catch (error: unknown) {
         this.logger.debug(`Did not found a valid derivation for ${identifier.path}: ${createErrorMessage(error)}`);
       }

@@ -1,4 +1,5 @@
-import { App, AppRunner, joinFilePath } from '@solid/community-server';
+import type { App } from '@solid/community-server';
+import { AppRunner, joinFilePath } from '@solid/community-server';
 import { DataFactory, Parser, Store } from 'n3';
 import literal = DataFactory.literal;
 import namedNode = DataFactory.namedNode;
@@ -27,7 +28,7 @@ describe('The server test setup', (): void => {
           port: 3456,
           loggingLevel: 'off',
         },
-      }
+      },
     );
 
     await app.start();
@@ -38,34 +39,35 @@ describe('The server test setup', (): void => {
   });
 
   it('returns the derived resource.', async(): Promise<void> => {
-    const res = await fetch('http://localhost:3456/test');
-    const store = await responseToStore(res, 'http://localhost:3456/test');
+    const res = await fetch('http://localhost:3456/derived/test');
+    const store = await responseToStore(res, 'http://localhost:3456/derived/test');
     expect(store.countQuads(null, null, null, null)).toBe(1);
     expect(store.countQuads(
-      namedNode('http://localhost:3456/selectors/data'),
+      namedNode('http://localhost:3456/data/data'),
       namedNode('http://xmlns.com/foaf/0.1/name'),
       literal('Example'),
-      null)).toBe(1);
+      null,
+    )).toBe(1);
   });
 
   it('returns the contents of the derived root container.', async(): Promise<void> => {
-    const res = await fetch('http://localhost:3456/');
-    const store = await responseToStore(res, 'http://localhost:3456/');
+    const res = await fetch('http://localhost:3456/derived/');
+    const store = await responseToStore(res, 'http://localhost:3456/derived/');
     expect(store.countQuads(null, null, null, null)).toBe(5);
-    const subject = namedNode('http://localhost:3456/');
+    const subject = namedNode('http://localhost:3456/derived/');
     const contains = namedNode('http://www.w3.org/ns/ldp#contains');
-    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/test'), null)).toBe(1);
-    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/template/'), null)).toBe(1);
-    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/query%7B?var%7D'), null)).toBe(1);
-    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/pattern'), null)).toBe(1);
-    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/multiple'), null)).toBe(1);
+    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/test'), null)).toBe(1);
+    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/template/'), null)).toBe(1);
+    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/query%7B?var%7D'), null)).toBe(1);
+    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/pattern'), null)).toBe(1);
+    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/multiple'), null)).toBe(1);
   });
 
   it('still returns original resources.', async(): Promise<void> => {
-    const res = await fetch('http://localhost:3456/selectors/data');
-    const store = await responseToStore(res, 'http://localhost:3456/selectors/data');
+    const res = await fetch('http://localhost:3456/data/data');
+    const store = await responseToStore(res, 'http://localhost:3456/data/data');
     expect(store.countQuads(null, null, null, null)).toBe(2);
-    const subject = namedNode('http://localhost:3456/selectors/data');
+    const subject = namedNode('http://localhost:3456/data/data');
     expect(store.countQuads(subject, namedNode('http://xmlns.com/foaf/0.1/knows'), namedNode('http://example.com/alice'), null)).toBe(1);
     expect(store.countQuads(subject, namedNode('http://xmlns.com/foaf/0.1/name'), literal('Example'), null)).toBe(1);
   });

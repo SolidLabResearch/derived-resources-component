@@ -1,19 +1,20 @@
-import {
+import type {
   ChangeMap,
   Conditions,
+  IdentifierStrategy,
+  Patch,
+  Representation,
+  ResourceIdentifier,
+  ResourceStore,
+} from '@solid/community-server';
+import {
   DC,
   getLoggerFor,
-  IdentifierStrategy,
   MethodNotAllowedHttpError,
   NotFoundHttpError,
   PassthroughStore,
-  Patch,
-  Representation,
-  RepresentationPreferences,
-  ResourceIdentifier,
-  ResourceStore
 } from '@solid/community-server';
-import { DerivationManager } from './DerivationManager';
+import type { DerivationManager } from './DerivationManager';
 
 /**
  * A {@link ResourceStore} which adds support for derived resources using a {@link DerivationManager}.
@@ -40,9 +41,10 @@ export class DerivedResourceStore extends PassthroughStore {
     return this.isDerivedResource(identifier, true);
   }
 
-  public async getRepresentation(identifier: ResourceIdentifier, preferences: RepresentationPreferences, conditions?: Conditions): Promise<Representation> {
+  public async getRepresentation(identifier: ResourceIdentifier): Promise<Representation> {
     const firstResource = await this.getFirstExistingResource(identifier);
-    this.logger.debug(`${firstResource.metadata.identifier.value} is the first resource that exists starting from ${identifier.path}`);
+    this.logger.debug(`${firstResource.metadata.identifier.value
+    } is the first resource that exists starting from ${identifier.path}`);
     const identifierExists = firstResource.metadata.identifier.value === identifier.path;
     const config = await this.manager.getDerivationConfig(identifier, firstResource.metadata);
 
@@ -69,17 +71,29 @@ export class DerivedResourceStore extends PassthroughStore {
     return result;
   }
 
-  public async addResource(container: ResourceIdentifier, representation: Representation, conditions?: Conditions): Promise<ChangeMap> {
+  public async addResource(
+    container: ResourceIdentifier,
+    representation: Representation,
+    conditions?: Conditions,
+  ): Promise<ChangeMap> {
     await this.assertNotDerived(container);
     return this.source.addResource(container, representation, conditions);
   }
 
-  public async setRepresentation(identifier: ResourceIdentifier, representation: Representation, conditions?: Conditions): Promise<ChangeMap> {
+  public async setRepresentation(
+    identifier: ResourceIdentifier,
+    representation: Representation,
+    conditions?: Conditions,
+  ): Promise<ChangeMap> {
     await this.assertNotDerived(identifier);
     return this.source.setRepresentation(identifier, representation, conditions);
   }
 
-  public async modifyResource(identifier: ResourceIdentifier, patch: Patch, conditions?: Conditions): Promise<ChangeMap> {
+  public async modifyResource(
+    identifier: ResourceIdentifier,
+    patch: Patch,
+    conditions?: Conditions,
+  ): Promise<ChangeMap> {
     await this.assertNotDerived(identifier);
     return this.source.modifyResource(identifier, patch, conditions);
   }
@@ -106,7 +120,8 @@ export class DerivedResourceStore extends PassthroughStore {
     try {
       const parent = await this.getFirstExistingResource(identifier, skipFirst);
       this.closeDataStream(parent);
-      this.logger.debug(`${parent.metadata.identifier.value} is the first resource that exists starting from ${identifier.path}`);
+      this.logger.debug(`${parent.metadata.identifier.value
+      } is the first resource that exists starting from ${identifier.path}`);
       const config = await this.manager.getDerivationConfig(identifier, parent.metadata);
 
       return Boolean(config);
@@ -130,7 +145,7 @@ export class DerivedResourceStore extends PassthroughStore {
       }
       // `await` is important here to make sure the error triggers
       return await this.source.getRepresentation(identifier, {});
-    } catch(error: unknown) {
+    } catch (error: unknown) {
       if (NotFoundHttpError.isInstance(error) && !this.identifierStrategy.isRootContainer(identifier)) {
         this.logger.debug(`${identifier.path} does not exist, going up the container chain.`);
         const parent = this.identifierStrategy.getParentContainer(identifier);
@@ -144,7 +159,7 @@ export class DerivedResourceStore extends PassthroughStore {
    * Closes the data stream in the representation, without emitting an error.
    */
   protected closeDataStream(representation: Representation): void {
-    representation.data.on('error', () => {});
+    representation.data.on('error', (): void => {});
     representation.data.destroy();
   }
 }

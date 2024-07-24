@@ -1,15 +1,18 @@
-import { BlankNode, NamedNode, Quad, Term } from '@rdfjs/types';
+import type { BlankNode, NamedNode, Quad, Term } from '@rdfjs/types';
+import type {
+  ResourceIdentifier,
+} from '@solid/community-server';
 import {
   getLoggerFor,
   InternalServerError,
   NotImplementedHttpError,
   RepresentationMetadata,
-  ResourceIdentifier
 } from '@solid/community-server';
 import Template from 'uri-template-lite';
-import { DerivationConfig } from '../DerivationConfig';
+import type { DerivationConfig } from '../DerivationConfig';
 import { DERIVED } from '../Vocabularies';
-import { DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
+import type { DerivationMatcherInput } from './DerivationMatcher';
+import { DerivationMatcher } from './DerivationMatcher';
 
 /**
  * Finds a matching derivation by matching the identifier to a template string.
@@ -17,7 +20,7 @@ import { DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
 export class TemplateDerivationMatcher extends DerivationMatcher {
   protected logger = getLoggerFor(this);
 
-  protected cache: WeakMap<ResourceIdentifier, Record<string, string>>
+  protected cache: WeakMap<ResourceIdentifier, Record<string, string>>;
 
   public constructor() {
     super();
@@ -52,11 +55,12 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
 
     const filters = metadata.quads(subject as NamedNode, DERIVED.terms.filter);
     if (filters.length !== 1) {
-      throw new InternalServerError(`Derived resources need exactly 1 filter. Found ${filters.length} for ${subject.value}`);
+      throw new InternalServerError(`Derived resources need exactly 1 filter. Found ${
+        filters.length} for ${subject.value}`);
     }
 
     const configMetadata = new RepresentationMetadata(subject as NamedNode);
-    configMetadata.addQuads([...this.getRelevantQuads(subject, metadata)]);
+    configMetadata.addQuads([ ...this.getRelevantQuads(subject, metadata) ]);
 
     this.logger.debug(`Found derived resource match for ${identifier.path} with subject ${subject.value}`);
     return {
@@ -75,7 +79,11 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
     return term.termType === 'NamedNode' || term.termType === 'BlankNode';
   }
 
-  protected *getRelevantQuads(subject: Term, metadata: RepresentationMetadata, cache: Set<string> = new Set()): Iterable<Quad> {
+  protected* getRelevantQuads(
+    subject: Term,
+    metadata: RepresentationMetadata,
+    cache: Set<string> = new Set(),
+  ): Iterable<Quad> {
     if (subject.termType !== 'NamedNode' && subject.termType !== 'BlankNode') {
       return;
     }

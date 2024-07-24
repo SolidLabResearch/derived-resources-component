@@ -1,31 +1,41 @@
-import {
+import type {
   AuxiliaryIdentifierStrategy,
   ChangeMap,
   Conditions,
-  createErrorMessage,
-  getLoggerFor,
-  PassthroughStore,
   Patch,
   Representation,
   RepresentationPreferences,
   ResourceIdentifier,
   ResourceStore,
-  SingleThreaded
+  SingleThreaded,
+} from '@solid/community-server';
+import {
+  createErrorMessage,
+  getLoggerFor,
+  PassthroughStore,
 } from '@solid/community-server';
 import { LRUCache } from 'lru-cache';
-import {
+import type {
   CachedRepresentation,
+} from './util/CacheUtil';
+import {
   cachedToRepresentation,
   calculateCachedRepresentationSize,
   duplicateRepresentation,
-  representationToCached
+  representationToCached,
 } from './util/CacheUtil';
 
 export interface CachedResourceStoreArgs {
   source: ResourceStore;
   metadataStrategy: AuxiliaryIdentifierStrategy;
-  cacheSettings?: { max?: number, maxSize?: number };
+  cacheSettings?: { max?: number; maxSize?: number };
 }
+
+export interface CacheEntry {
+  identifier: ResourceIdentifier;
+  representation: Representation;
+}
+
 /**
  * A {@link ResourceStore} that caches representation responses.
  * Caching is done using the identifier as key, so this should be at the end of the store chain.
@@ -45,13 +55,14 @@ export class CachedResourceStore extends PassthroughStore implements SingleThrea
   protected readonly cache: LRUCache<string, CachedRepresentation>;
 
   // Allows canceling caching if the resource was invalidated before caching was finished
-  protected readonly cacheProgress: Record<string, { identifier: ResourceIdentifier, representation: Representation }> = {};
+  protected readonly cacheProgress: Record<string, CacheEntry> = {};
 
   public constructor(args: CachedResourceStoreArgs) {
     super(args.source);
     this.metadataStrategy = args.metadataStrategy;
     const max = args.cacheSettings?.max ?? 1000;
-    const maxSize = args.cacheSettings?.maxSize ?? 100_000_000; // 100 MB
+    // 100 MB
+    const maxSize = args.cacheSettings?.maxSize ?? 100_000_000;
 
     this.cache = new LRUCache({ max, maxSize, sizeCalculation: calculateCachedRepresentationSize });
   }
@@ -63,7 +74,11 @@ export class CachedResourceStore extends PassthroughStore implements SingleThrea
     return super.hasResource(identifier);
   }
 
-  public async getRepresentation(identifier: ResourceIdentifier, preferences: RepresentationPreferences, conditions?: Conditions): Promise<Representation> {
+  public async getRepresentation(
+    identifier: ResourceIdentifier,
+    preferences: RepresentationPreferences,
+    conditions?: Conditions,
+  ): Promise<Representation> {
     this.logger.debug(`Checking cache with key ${identifier.path}`);
 
     const cached = this.cache.get(identifier.path);
@@ -75,19 +90,31 @@ export class CachedResourceStore extends PassthroughStore implements SingleThrea
     return this.cacheRepresentation(identifier, representation);
   }
 
-  public async addResource(container: ResourceIdentifier, representation: Representation, conditions?: Conditions): Promise<ChangeMap> {
+  public async addResource(
+    container: ResourceIdentifier,
+    representation: Representation,
+    conditions?: Conditions,
+  ): Promise<ChangeMap> {
     const changes = await super.addResource(container, representation, conditions);
     this.invalidateCache(changes);
     return changes;
   }
 
-  public async setRepresentation(identifier: ResourceIdentifier, representation: Representation, conditions?: Conditions): Promise<ChangeMap> {
+  public async setRepresentation(
+    identifier: ResourceIdentifier,
+    representation: Representation,
+    conditions?: Conditions,
+  ): Promise<ChangeMap> {
     const changes = await super.setRepresentation(identifier, representation, conditions);
     this.invalidateCache(changes);
     return changes;
   }
 
-  public async modifyResource(identifier: ResourceIdentifier, patch: Patch, conditions?: Conditions): Promise<ChangeMap> {
+  public async modifyResource(
+    identifier: ResourceIdentifier,
+    patch: Patch,
+    conditions?: Conditions,
+  ): Promise<ChangeMap> {
     const changes = await super.modifyResource(identifier, patch, conditions);
     this.invalidateCache(changes);
     return changes;
@@ -118,16 +145,16 @@ export class CachedResourceStore extends PassthroughStore implements SingleThrea
 
     // Don't await so caching doesn't block returning a result
     representationToCached(copy1)
-      .then((newCached) => {
+      .then((newCached): void => {
         // Progress entry being removed implies that the result was invalidated in the meantime
         if (this.cacheProgress[identifier.path]?.identifier === identifier) {
           this.cache.set(identifier.path, newCached);
           delete this.cacheProgress[identifier.path];
         }
       })
-      .catch((err) => {
+      .catch((err): void => {
         // This just means the request was not interested in the data and closed the stream
-        if (err.message !== 'Premature close') {
+        if ((err as Error).message !== 'Premature close') {
           this.logger.error(`Unable to cache representation for ${identifier.path}: ${createErrorMessage(err)}`);
         }
       });

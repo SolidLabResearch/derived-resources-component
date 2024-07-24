@@ -1,14 +1,16 @@
-import {
+import type {
   AccessMap,
+  PermissionReader,
+  ResourceIdentifier,
+} from '@solid/community-server';
+import {
   AccessMode,
   IdentifierSetMultiMap,
   InternalServerError,
-  PermissionReader,
-  ResourceIdentifier
 } from '@solid/community-server';
-import { CredentialsStorage } from '../credentials/CredentialsStorage';
-import { DerivationConfig } from '../DerivationConfig';
-import { ParamSetter } from '../init/ParamSetter';
+import type { CredentialsStorage } from '../credentials/CredentialsStorage';
+import type { DerivationConfig } from '../DerivationConfig';
+import type { ParamSetter } from '../init/ParamSetter';
 import { DERIVED } from '../Vocabularies';
 import { SelectorParser } from './SelectorParser';
 
@@ -40,7 +42,7 @@ export class AuthorizedSelectorParser extends SelectorParser implements ParamSet
     if (!this.internalPermissionReader) {
       throw new InternalServerError('Trying to access permission reader before initialization.');
     }
-    return this.internalPermissionReader!;
+    return this.internalPermissionReader;
   }
 
   public async canHandle(config: DerivationConfig): Promise<void> {
@@ -60,7 +62,7 @@ export class AuthorizedSelectorParser extends SelectorParser implements ParamSet
       requestedModes.set(identifier, AccessMode.read);
     }
 
-    const permissions = await this.permissionReader.handleSafe({ credentials, requestedModes })
-    return identifiers.filter((identifier): Boolean => Boolean(permissions.get(identifier)?.read));
+    const permissions = await this.permissionReader.handleSafe({ credentials, requestedModes });
+    return identifiers.filter((identifier): boolean => Boolean(permissions.get(identifier)?.read));
   }
 }

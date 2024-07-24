@@ -1,10 +1,10 @@
 import { NotImplementedHttpError, RepresentationMetadata } from '@solid/community-server';
-import { FilterExecutor, FilterExecutorInput } from '../../../src/filter/FilterExecutor';
+import type { FilterExecutor, FilterExecutorInput } from '../../../src/filter/FilterExecutor';
 import { MappingFilterExecutor } from '../../../src/filter/MappingFilterExecutor';
 
 describe('MappingFilterExecutor', (): void => {
   const representation = 'representation';
-  let input: FilterExecutorInput;
+  let input: FilterExecutorInput<string>;
   let source: jest.Mocked<FilterExecutor>;
   let executor: MappingFilterExecutor;
 
@@ -33,7 +33,7 @@ describe('MappingFilterExecutor', (): void => {
   });
 
   it('rejects non-string filters.', async(): Promise<void> => {
-    input.filter.data = {};
+    (input as unknown as FilterExecutorInput<object>).filter.data = {};
     await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
   });
 
@@ -51,8 +51,8 @@ describe('MappingFilterExecutor', (): void => {
       ...input,
       filter: {
         ...input.filter,
-        data: 'string with value in it'
-      }
+        data: 'string with value in it',
+      },
     });
   });
 });

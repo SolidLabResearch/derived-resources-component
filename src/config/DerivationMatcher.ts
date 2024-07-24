@@ -1,6 +1,7 @@
-import { Term } from '@rdfjs/types';
-import { AsyncHandler, RepresentationMetadata, ResourceIdentifier } from '@solid/community-server';
-import { DerivationConfig } from '../DerivationConfig';
+import type { Term } from '@rdfjs/types';
+import type { RepresentationMetadata, ResourceIdentifier } from '@solid/community-server';
+import { AsyncHandler } from '@solid/community-server';
+import type { DerivationConfig } from '../DerivationConfig';
 
 export interface DerivationMatcherInput {
   /**

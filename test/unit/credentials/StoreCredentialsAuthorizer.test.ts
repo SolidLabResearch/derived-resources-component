@@ -1,13 +1,13 @@
-import { AccessMap, AccessMode, Credentials, PermissionMap } from '@solid/community-server';
-import { IdentifierSetMultiMap } from '@solid/community-server/dist/util/map/IdentifierMap';
-import { CredentialsStorage } from '../../../src/credentials/CredentialsStorage';
+import type { AccessMap, Credentials, PermissionMap } from '@solid/community-server';
+import { AccessMode, IdentifierSetMultiMap } from '@solid/community-server';
+import type { CredentialsStorage } from '../../../src/credentials/CredentialsStorage';
 import { StoreCredentialsAuthorizer } from '../../../src/credentials/StoreCredentialsAuthorizer';
 
 describe('StoreCredentialsAuthorizer', (): void => {
   const credentials: Credentials = { agent: { webId: 'http://example.com/alice' }};
   const requestedModes: AccessMap = new IdentifierSetMultiMap<AccessMode>([
-    [ { path: 'http://example.com/foo' }, AccessMode.read ],
-    [ { path: 'http://example.com/bar' }, AccessMode.read ],
+    [{ path: 'http://example.com/foo' }, AccessMode.read ],
+    [{ path: 'http://example.com/bar' }, AccessMode.read ],
   ]);
   const availablePermissions: PermissionMap = 'permissions' as any;
   let storage: jest.Mocked<CredentialsStorage>;
@@ -15,7 +15,7 @@ describe('StoreCredentialsAuthorizer', (): void => {
 
   beforeEach(async(): Promise<void> => {
     storage = {
-      set: jest.fn()
+      set: jest.fn(),
     } satisfies Partial<CredentialsStorage> as any;
 
     authorizer = new StoreCredentialsAuthorizer(storage);

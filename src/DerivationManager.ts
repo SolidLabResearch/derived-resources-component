@@ -1,5 +1,5 @@
-import { Representation, RepresentationMetadata, ResourceIdentifier } from '@solid/community-server';
-import { DerivationConfig } from './DerivationConfig';
+import type { Representation, RepresentationMetadata, ResourceIdentifier } from '@solid/community-server';
+import type { DerivationConfig } from './DerivationConfig';
 
 /**
  * Responsible for handling derived resources.
@@ -14,7 +14,8 @@ export interface DerivationManager {
    *
    * @returns The applicable configuration. `undefined` if this resource is not to be derived.
    */
-  getDerivationConfig(identifier: ResourceIdentifier, metadata: RepresentationMetadata): Promise<DerivationConfig | undefined>;
+  getDerivationConfig: (identifier: ResourceIdentifier, metadata: RepresentationMetadata) =>
+  Promise<DerivationConfig | undefined>;
 
   /**
    * Derives a resource based on the information provided in the {@link DerivationConfig}.
@@ -22,6 +23,5 @@ export interface DerivationManager {
    * @param identifier - Identifier to derive the representation for.
    * @param config - Config to use to derive the representation.
    */
-  deriveResource(identifier: ResourceIdentifier, config: DerivationConfig): Promise<Representation>;
+  deriveResource: (identifier: ResourceIdentifier, config: DerivationConfig) => Promise<Representation>;
 }
-

@@ -3,7 +3,7 @@ import { WeakStorage } from '../../../src/credentials/WeakStorage';
 
 describe('WeakStorage', (): void => {
   it('works as a storage.', async(): Promise<void> => {
-    const storage = new WeakStorage();
+    const storage = new WeakStorage<Record<string, string>, string>();
     const key = { test: 'key' };
     const value = 'value';
     await expect(storage.has(key)).resolves.toBe(false);
@@ -19,6 +19,6 @@ describe('WeakStorage', (): void => {
 
   it('errors when calling entries.', async(): Promise<void> => {
     const storage = new WeakStorage();
-    expect(() => storage.entries()).toThrow(NotImplementedHttpError);
+    expect((): void => storage.entries()).toThrow(NotImplementedHttpError);
   });
 });

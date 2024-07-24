@@ -1,14 +1,18 @@
-import { createErrorMessage, DC, getLoggerFor, Representation } from '@solid/community-server';
-import { LRUCache } from 'lru-cache';
 import { createHash } from 'node:crypto';
-import {
+import type { Representation } from '@solid/community-server';
+import { createErrorMessage, DC, getLoggerFor } from '@solid/community-server';
+import { LRUCache } from 'lru-cache';
+import type {
   CachedRepresentation,
+} from '../util/CacheUtil';
+import {
   cachedToRepresentation,
   calculateCachedRepresentationSize,
   duplicateRepresentation,
-  representationToCached
+  representationToCached,
 } from '../util/CacheUtil';
-import { FilterExecutor, FilterExecutorInput } from './FilterExecutor';
+import type { FilterExecutorInput } from './FilterExecutor';
+import { FilterExecutor } from './FilterExecutor';
 
 interface ChecksumCachedRepresentation extends CachedRepresentation {
   checksum: string;
@@ -32,7 +36,8 @@ export class CachedFilterExecutor extends FilterExecutor {
     super();
     this.source = source;
     const max = cacheSettings?.max ?? 1000;
-    const maxSize = cacheSettings?.maxSize ?? 100_000_000; // 100 MB
+    // 100 MB
+    const maxSize = cacheSettings?.maxSize ?? 100_000_000;
 
     this.cache = new LRUCache({ max, maxSize, sizeCalculation: calculateCachedRepresentationSize });
   }
@@ -70,10 +75,10 @@ export class CachedFilterExecutor extends FilterExecutor {
     const [ copy1, copy2 ] = duplicateRepresentation(representation);
     // Don't await so the result can immediately be returned while caching
     representationToCached(copy1)
-      .then((newCached) => this.cache.set(key, { ...newCached, checksum }))
-      .catch((err) => {
+      .then((newCached): unknown => this.cache.set(key, { ...newCached, checksum }))
+      .catch((err): void => {
         // This just means the request was not interested in the data and closed the stream
-        if (err.message !== 'Premature close') {
+        if ((err as Error).message !== 'Premature close') {
           this.logger.error(`Unable to cache derived representation for ${key}: ${createErrorMessage(err)}`);
         }
       });

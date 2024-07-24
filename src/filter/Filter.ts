@@ -1,4 +1,4 @@
-import { RepresentationMetadata } from '@solid/community-server';
+import type { RepresentationMetadata } from '@solid/community-server';
 
 /**
  * The result of parsing filter metadata.

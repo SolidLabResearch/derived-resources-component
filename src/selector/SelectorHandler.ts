@@ -1,5 +1,6 @@
-import { AsyncHandler, Representation } from '@solid/community-server';
-import { DerivationConfig } from '../DerivationConfig';
+import type { Representation } from '@solid/community-server';
+import { AsyncHandler } from '@solid/community-server';
+import type { DerivationConfig } from '../DerivationConfig';
 
 /**
  * Acquires one or more {@link Representation}s based on a {@link DerivationConfig}.

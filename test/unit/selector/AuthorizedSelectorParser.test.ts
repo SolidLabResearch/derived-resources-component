@@ -1,22 +1,27 @@
-import {
+import type {
   AccessMap,
-  AccessMode, Credentials, IdentifierSetMultiMap,
-  InternalServerError,
+  Credentials,
   PermissionReader,
-  RepresentationMetadata,
-  ResourceIdentifier
+  PermissionSet,
+  ResourceIdentifier,
 } from '@solid/community-server';
-import { PermissionSet } from '@solid/community-server/dist/authorization/permissions/Permissions';
-import { IdentifierMap } from '@solid/community-server/dist/util/map/IdentifierMap';
-import { CredentialsStorage } from '../../../src/credentials/CredentialsStorage';
-import { DerivationConfig } from '../../../src/DerivationConfig';
+import {
+  AccessMode,
+  IdentifierMap,
+  IdentifierSetMultiMap,
+  InternalServerError
+  ,
+  RepresentationMetadata,
+} from '@solid/community-server';
+import type { CredentialsStorage } from '../../../src/credentials/CredentialsStorage';
+import type { DerivationConfig } from '../../../src/DerivationConfig';
 import { AuthorizedSelectorParser } from '../../../src/selector/AuthorizedSelectorParser';
-import { SelectorParser } from '../../../src/selector/SelectorParser';
+import type { SelectorParser } from '../../../src/selector/SelectorParser';
 import { DERIVED } from '../../../src/Vocabularies';
 
 describe('AuthorizedSelectorParser', (): void => {
   let config: DerivationConfig;
-  const credentials: Credentials = { agent: { webId: 'WebID' } };
+  const credentials: Credentials = { agent: { webId: 'WebID' }};
   const identifiers: ResourceIdentifier[] = [
     { path: 'http://example.com/public' },
     { path: 'http://example.com/restricted' },
@@ -46,7 +51,7 @@ describe('AuthorizedSelectorParser', (): void => {
     } satisfies Partial<CredentialsStorage> as any;
 
     permissionReader = {
-      handleSafe: jest.fn().mockResolvedValue(new IdentifierMap<PermissionSet>([[ { path: 'http://example.com/public' }, { [AccessMode.read]: true } ]])),
+      handleSafe: jest.fn().mockResolvedValue(new IdentifierMap<PermissionSet>([[{ path: 'http://example.com/public' }, { [AccessMode.read]: true }]])),
     } satisfies Partial<PermissionReader> as any;
 
     parser = new AuthorizedSelectorParser(source, storage);
@@ -72,8 +77,10 @@ describe('AuthorizedSelectorParser', (): void => {
   it('only returns the readable sources if the feature is enabled.', async(): Promise<void> => {
     config.metadata.add(DERIVED.terms.feature, DERIVED.terms.ReadableSources);
     await parser.setParam(permissionReader);
-    await expect(parser.handle(config)).resolves.toEqual([ { path: 'http://example.com/public' } ]);
-    const requestedModes: AccessMap = new IdentifierSetMultiMap<AccessMode>([[ identifiers[0], AccessMode.read ], [ identifiers[1], AccessMode.read ]]);
+    await expect(parser.handle(config)).resolves.toEqual([{ path: 'http://example.com/public' }]);
+    const requestedModes: AccessMap = new IdentifierSetMultiMap<AccessMode>(
+      [[ identifiers[0], AccessMode.read ], [ identifiers[1], AccessMode.read ]],
+    );
     expect(permissionReader.handleSafe).toHaveBeenLastCalledWith({ credentials, requestedModes });
   });
 });

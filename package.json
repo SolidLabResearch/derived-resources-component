@@ -2,6 +2,7 @@
   "name": "@solidlab/derived-resources-component",
   "version": "1.1.0",
   "description": "Adds derived resources to the Community Solid Server",
+  "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component",
@@ -14,6 +15,10 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component/^1.0.0/config/": "config/",
     "https://linkedsoftwaredependencies.org/bundles/npm/@solidlab/derived-resources-component/^1.0.0/dist/": "dist/"
   },
+  "files": [
+    "config",
+    "dist"
+  ],
   "scripts": {
     "start": "community-solid-server -c @css:config/file.json config/derived-auth.json -f .data -m .",
     "start:debug": "community-solid-server -c @css:config/file-root.json config/derived-auth.json -f .data -m . -t",
@@ -21,13 +26,9 @@
     "build": "npm run build:ts && npm run build:components",
     "build:components": "componentsjs-generator -s src -c dist/components -i .componentsignore -r derived",
     "build:ts": "tsc",
+    "lint": "eslint . --cache --max-warnings 0",
     "test": "jest"
   },
-  "files": [
-    "dist",
-    "config"
-  ],
-  "license": "MIT",
   "dependencies": {
     "@comunica/query-sparql": "^2.10.2",
     "@rdfjs/types": "^1.1.0",
@@ -43,6 +44,7 @@
     "@types/jest": "^29.5.12",
     "componentsjs-generator": "^3.1.2",
     "jest": "^29.7.0",
+    "opinionated-eslint-config": "^0.1.0",
     "rdf-js": "^4.0.2",
     "ts-jest": "^29.1.2"
   }

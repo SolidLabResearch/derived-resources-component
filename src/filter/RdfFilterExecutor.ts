@@ -1,8 +1,10 @@
-import { INTERNAL_QUADS, NotImplementedHttpError, Representation } from '@solid/community-server';
-import { Store } from 'n3';
 import { once } from 'node:events';
-import { FilterExecutor, FilterExecutorInput } from './FilterExecutor';
-import { N3FilterExecutor } from './N3FilterExecutor';
+import type { Representation } from '@solid/community-server';
+import { INTERNAL_QUADS, NotImplementedHttpError } from '@solid/community-server';
+import { Store } from 'n3';
+import type { FilterExecutorInput } from './FilterExecutor';
+import { FilterExecutor } from './FilterExecutor';
+import type { N3FilterExecutor } from './N3FilterExecutor';
 
 /**
  * Converts the input quad streams into a single N3.js store and calls an {@link N3FilterExecutor}.

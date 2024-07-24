@@ -1,10 +1,10 @@
-import { Quad } from '@rdfjs/types';
+import type { Quad } from '@rdfjs/types';
 import { BasicRepresentation, INTERNAL_QUADS, readableToQuads } from '@solid/community-server';
 import { DataFactory } from 'n3';
 import { BaseQuadFilterParser } from '../../../../src/filter/idx/BaseQuadFilterParser';
 
 describe('A BaseQuadFilterParser', (): void => {
-  let filter: Partial<Quad> = {
+  const filter: Partial<Quad> = {
     predicate: DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
     object: DataFactory.variable('v'),
   };

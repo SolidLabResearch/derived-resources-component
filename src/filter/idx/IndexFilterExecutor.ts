@@ -1,18 +1,22 @@
-import { BlankNode, Quad, Quad_Object, Term } from '@rdfjs/types';
+import type { Readable } from 'node:stream';
+import { PassThrough } from 'node:stream';
+import type { BlankNode, Quad, Quad_Object, Term } from '@rdfjs/types';
+import type {
+  Representation,
+} from '@solid/community-server';
 import {
   BasicRepresentation,
   INTERNAL_QUADS,
   NotImplementedHttpError,
   PREFERRED_PREFIX_TERM,
-  Representation,
   SOLID_META,
-  transformSafely
+  transformSafely,
 } from '@solid/community-server';
 import { DataFactory, Store } from 'n3';
-import { PassThrough, Readable } from 'node:stream';
 import { DERIVED_INDEX } from '../../Vocabularies';
-import { FilterExecutor, FilterExecutorInput } from '../FilterExecutor';
-import { QuadFilterParser } from './QuadFilterParser';
+import type { FilterExecutorInput } from '../FilterExecutor';
+import { FilterExecutor } from '../FilterExecutor';
+import type { QuadFilterParser } from './QuadFilterParser';
 
 const EXPECTED_KEYS = [ 'subject', 'predicate', 'object', 'graph' ] as const;
 
@@ -41,7 +45,7 @@ export class IndexFilterExecutor extends FilterExecutor {
       throw new NotImplementedHttpError('Expected filter data to be a string.');
     }
 
-    const json = JSON.parse(filter.data);
+    const json = JSON.parse(filter.data) as Record<string, unknown>;
     if (!Object.keys(json).every((key): boolean => (EXPECTED_KEYS as readonly string[]).includes(key))) {
       throw new NotImplementedHttpError('Expected a json object with keys subject, predicate, object and/or graph.');
     }
@@ -86,18 +90,28 @@ export class IndexFilterExecutor extends FilterExecutor {
     const merged = this.mergeStreams(streams);
 
     const representation = new BasicRepresentation(merged, input.config.identifier, INTERNAL_QUADS);
-    representation.metadata.addQuad(DERIVED_INDEX.terms.namespace, PREFERRED_PREFIX_TERM, 'derived-index', SOLID_META.terms.ResponseMetadata);
+    representation.metadata.addQuad(
+      DERIVED_INDEX.terms.namespace,
+      PREFERRED_PREFIX_TERM,
+      'derived-index',
+      SOLID_META.terms.ResponseMetadata,
+    );
 
     return representation;
   }
 
-  protected createQuadFn(position: typeof EXPECTED_KEYS[number], store: Store, matches: Record<string, BlankNode>, instance: Quad_Object): (quad: Quad) => Quad[] {
+  protected createQuadFn(
+    position: typeof EXPECTED_KEYS[number],
+    store: Store,
+    matches: Record<string, BlankNode>,
+    instance: Quad_Object,
+  ): (quad: Quad) => Quad[] {
     return (quad: Quad): Quad[] => {
-      let existingNode = matches[quad[position].value];
+      const existingNode = matches[quad[position].value];
       if (existingNode) {
         // If we already have a match, the `derived-index:for` triple has already been generated
         return [
-          DataFactory.quad(existingNode, DataFactory.namedNode(DERIVED_INDEX.instance), instance)
+          DataFactory.quad(existingNode, DataFactory.namedNode(DERIVED_INDEX.instance), instance),
         ];
       }
       const blankNode = store.createBlankNode();
@@ -107,12 +121,12 @@ export class IndexFilterExecutor extends FilterExecutor {
         DataFactory.quad(blankNode, DataFactory.namedNode(DERIVED_INDEX.for), quad[position] as Quad_Object),
         DataFactory.quad(blankNode, DataFactory.namedNode(DERIVED_INDEX.instance), instance),
       ];
-    }
+    };
   }
 
   protected createTransform(data: Readable, quadFn: (quad: Quad) => Quad[]): Readable {
     const transformed = transformSafely(data, {
-      transform: (data: Quad) => {
+      transform: (data: Quad): void => {
         for (const quads of quadFn(data)) {
           transformed.push(quads);
         }
@@ -127,10 +141,10 @@ export class IndexFilterExecutor extends FilterExecutor {
     const merged = new PassThrough({ objectMode: true });
     for (const stream of streams) {
       stream.pipe(merged, { end: false });
-      stream.on('error', (error) => {
+      stream.on('error', (error): void => {
         merged.destroy(error);
-      })
-      stream.on('end', () => {
+      });
+      stream.on('end', (): void => {
         count -= 1;
         if (count === 0) {
           merged.end();

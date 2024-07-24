@@ -1,5 +1,5 @@
 import { ParamInitializer } from '../../../src/init/ParamInitializer';
-import { ParamSetter } from '../../../src/init/ParamSetter';
+import type { ParamSetter } from '../../../src/init/ParamSetter';
 
 const exit = jest.spyOn(process, 'exit').mockImplementation(jest.fn() as any);
 
@@ -9,20 +9,21 @@ describe('ParamInitializer', (): void => {
 
   beforeEach(async(): Promise<void> => {
     setter = {
-      setParam: jest.fn().mockResolvedValue(undefined)
+      setParam: jest.fn().mockResolvedValue(undefined),
     };
-
   });
 
   it('sets the param.', async(): Promise<void> => {
-    const initializer = new ParamInitializer(setter, param);
+    // eslint-disable-next-line no-new
+    new ParamInitializer(setter, param);
     expect(setter.setParam).toHaveBeenLastCalledWith(param);
     expect(exit).toHaveBeenCalledTimes(0);
   });
 
   it('exits if there was an error.', async(): Promise<void> => {
     setter.setParam.mockRejectedValueOnce(new Error('bad data'));
-    const initializer = new ParamInitializer(setter, param);
+    // eslint-disable-next-line no-new
+    new ParamInitializer(setter, param);
     expect(setter.setParam).toHaveBeenLastCalledWith(param);
     await Promise.resolve('wait');
     expect(exit).toHaveBeenCalledTimes(1);

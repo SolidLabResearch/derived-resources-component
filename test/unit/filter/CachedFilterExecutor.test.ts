@@ -1,6 +1,14 @@
-import { BasicRepresentation, DC, readableToString, RepresentationMetadata } from '@solid/community-server';
+import type {
+  Representation,
+} from '@solid/community-server';
+import {
+  BasicRepresentation,
+  DC,
+  readableToString,
+  RepresentationMetadata,
+} from '@solid/community-server';
 import { CachedFilterExecutor } from '../../../src/filter/CachedFilterExecutor';
-import { FilterExecutor, FilterExecutorInput } from '../../../src/filter/FilterExecutor';
+import type { FilterExecutor, FilterExecutorInput } from '../../../src/filter/FilterExecutor';
 
 async function flushPromises(): Promise<void> {
   // This flushes the promises, causing the cache to be filled
@@ -34,7 +42,7 @@ describe('A CachedFilterExecutor', (): void => {
 
     source = {
       canHandle: jest.fn(),
-      handle: jest.fn(async(...args) => new BasicRepresentation('test', 'text/plain')),
+      handle: jest.fn(async(): Promise<Representation> => new BasicRepresentation('test', 'text/plain')),
     } satisfies Partial<FilterExecutor> as any;
 
     executor = new CachedFilterExecutor(source);

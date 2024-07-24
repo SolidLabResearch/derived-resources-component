@@ -1,5 +1,10 @@
+import { on } from 'node:events';
+import { Readable } from 'node:stream';
 import { QueryEngine } from '@comunica/query-sparql';
-import { Quad } from '@rdfjs/types';
+import type { Quad } from '@rdfjs/types';
+import type {
+  Representation,
+} from '@solid/community-server';
 import {
   BasicRepresentation,
   createErrorMessage,
@@ -7,12 +12,10 @@ import {
   INTERNAL_QUADS,
   InternalServerError,
   NotImplementedHttpError,
-  Representation
 } from '@solid/community-server';
-import * as asyncIt from 'asynciterator';
-import { on } from 'node:events';
-import { Readable } from 'node:stream';
-import { N3FilterExecutor, N3FilterExecutorInput } from './N3FilterExecutor';
+import type * as asyncIt from 'asynciterator';
+import type { N3FilterExecutorInput } from './N3FilterExecutor';
+import { N3FilterExecutor } from './N3FilterExecutor';
 
 /**
  * Applies a SPARQL filter to an N3.js store.
@@ -37,19 +40,28 @@ export class SparqlFilterExecutor extends N3FilterExecutor {
     this.logger.debug(`Using filter with contents ${query}`);
 
     try {
-      const result = await this.engine.queryQuads(query, { sources: [data] });
-      return new BasicRepresentation(Readable.from(this.convertAsyncIterator(result)), config.identifier, INTERNAL_QUADS);
-    } catch(error: unknown) {
-      throw new InternalServerError(`There was a problem applying the filter while generating the derived resource: ${createErrorMessage(error)}`);
+      const result = await this.engine.queryQuads(query, { sources: [ data ]});
+      return new BasicRepresentation(
+        Readable.from(this.convertAsyncIterator(result)),
+        config.identifier,
+        INTERNAL_QUADS,
+      );
+    } catch (error: unknown) {
+      throw new InternalServerError(
+        `There was a problem applying the filter while generating the derived resource: ${createErrorMessage(error)}`,
+      );
     }
   }
 
   /**
    * Converts a stream from the AsyncIterator library to an async generator.
    */
-  protected async *convertAsyncIterator(it: asyncIt.AsyncIterator<Quad>): AsyncIterable<Quad> {
+  protected async* convertAsyncIterator(it: asyncIt.AsyncIterator<Quad>): AsyncIterable<Quad> {
     const dataIt = on(it, 'data');
-    it.on('end', () => dataIt.return!());
+    // eslint-disable-next-line ts/no-misused-promises
+    it.on('end', async(): Promise<void> => {
+      await dataIt.return!();
+    });
     for await (const data of dataIt) {
       yield* data;
     }

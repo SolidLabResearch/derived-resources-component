@@ -1,3 +1,5 @@
+import type { Readable } from 'node:stream';
+import type { Guarded } from '@solid/community-server';
 import {
   BasicRepresentation,
   CONTENT_TYPE,
@@ -5,12 +7,12 @@ import {
   INTERNAL_QUADS,
   NotImplementedHttpError,
   readableToQuads,
-  RepresentationMetadata
+  RepresentationMetadata,
 } from '@solid/community-server';
 import { DataFactory } from 'n3';
-import { FilterExecutorInput } from '../../../../src/filter/FilterExecutor';
+import type { FilterExecutorInput } from '../../../../src/filter/FilterExecutor';
 import { IndexFilterExecutor } from '../../../../src/filter/idx/IndexFilterExecutor';
-import { QuadFilterParser } from '../../../../src/filter/idx/QuadFilterParser';
+import type { QuadFilterParser } from '../../../../src/filter/idx/QuadFilterParser';
 import { DERIVED_INDEX } from '../../../../src/Vocabularies';
 
 describe('IndexFilterExecutor', (): void => {
@@ -23,12 +25,12 @@ describe('IndexFilterExecutor', (): void => {
   const filter = {
     predicate: {
       termType: 'NamedNode',
-      value: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+      value: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
     },
     object: {
       termType: 'Variable',
-      value: 'v'
-    }
+      value: 'v',
+    },
   };
   let resourceIndexParser: jest.Mocked<QuadFilterParser>;
   let input: FilterExecutorInput;
@@ -59,11 +61,11 @@ describe('IndexFilterExecutor', (): void => {
         new BasicRepresentation([], id1),
         new BasicRepresentation([], id2),
       ],
-    }
+    };
 
     resourceIndexParser = {
       canHandle: jest.fn(),
-      handle: jest.fn(async({ representation }) => {
+      handle: jest.fn(async({ representation }): Promise<Guarded<Readable>> => {
         if (representation.metadata.identifier.equals(id1)) {
           return guardedStreamFrom(quads1);
         }
@@ -93,12 +95,12 @@ describe('IndexFilterExecutor', (): void => {
     input.filter.data = JSON.stringify({
       predicate: {
         termType: 'Variable',
-        values: 'v1'
+        values: 'v1',
       },
       object: {
         termType: 'Variable',
-        values: 'v2'
-      }
+        values: 'v2',
+      },
     });
     await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
   });
@@ -106,8 +108,10 @@ describe('IndexFilterExecutor', (): void => {
   it('requires the ResourceIndexParser to accept all representations.', async(): Promise<void> => {
     await expect(executor.canHandle(input)).resolves.toBeUndefined();
     expect(resourceIndexParser.canHandle).toHaveBeenCalledTimes(2);
-    expect(resourceIndexParser.canHandle).toHaveBeenNthCalledWith(1, { filter, representation: input.representations[0] });
-    expect(resourceIndexParser.canHandle).toHaveBeenNthCalledWith(2, { filter, representation: input.representations[1] });
+    expect(resourceIndexParser.canHandle)
+      .toHaveBeenNthCalledWith(1, { filter, representation: input.representations[0] });
+    expect(resourceIndexParser.canHandle)
+      .toHaveBeenNthCalledWith(2, { filter, representation: input.representations[1] });
   });
 
   it('generates the correct triples based on the input streams.', async(): Promise<void> => {

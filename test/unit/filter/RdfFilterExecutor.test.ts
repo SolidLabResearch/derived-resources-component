@@ -2,11 +2,11 @@ import {
   BasicRepresentation,
   INTERNAL_QUADS,
   NotImplementedHttpError,
-  RepresentationMetadata
+  RepresentationMetadata,
 } from '@solid/community-server';
 import { DataFactory, Store } from 'n3';
-import { FilterExecutorInput } from '../../../src/filter/FilterExecutor';
-import { N3FilterExecutor } from '../../../src/filter/N3FilterExecutor';
+import type { FilterExecutorInput } from '../../../src/filter/FilterExecutor';
+import type { N3FilterExecutor } from '../../../src/filter/N3FilterExecutor';
 import { RdfFilterExecutor } from '../../../src/filter/RdfFilterExecutor';
 
 describe('RdfFilterExecutor', (): void => {
@@ -41,8 +41,8 @@ describe('RdfFilterExecutor', (): void => {
       representations: [
         new BasicRepresentation([ quad1 ], INTERNAL_QUADS),
         new BasicRepresentation([ quad2 ], INTERNAL_QUADS),
-      ]
-    }
+      ],
+    };
 
     source = {
       canHandle: jest.fn(),

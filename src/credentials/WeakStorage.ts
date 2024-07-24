@@ -1,10 +1,11 @@
-import { KeyValueStorage, NotImplementedHttpError } from '@solid/community-server';
+import type { KeyValueStorage } from '@solid/community-server';
+import { NotImplementedHttpError } from '@solid/community-server';
 
 /**
  * A {@link KeyValueStorage} that uses a {@link WeakMap} to store the values.
  * Because of this, the key value is expected to be an object and not a primitive value.
  */
-export class WeakStorage<TKey extends {}, TValue> implements KeyValueStorage<TKey, TValue> {
+export class WeakStorage<TKey extends Record<string, unknown>, TValue> implements KeyValueStorage<TKey, TValue> {
   protected readonly cache: WeakMap<TKey, TValue>;
 
   public constructor() {

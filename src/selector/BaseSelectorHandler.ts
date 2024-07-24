@@ -1,7 +1,8 @@
-import { asyncToArray, INTERNAL_QUADS, Representation, ResourceStore } from '@solid/community-server';
-import { DerivationConfig } from '../DerivationConfig';
+import type { Representation, ResourceStore } from '@solid/community-server';
+import { asyncToArray, INTERNAL_QUADS } from '@solid/community-server';
+import type { DerivationConfig } from '../DerivationConfig';
 import { SelectorHandler } from './SelectorHandler';
-import { SelectorParser } from './SelectorParser';
+import type { SelectorParser } from './SelectorParser';
 
 /**
  * Determines all the input resources by calling a {@link SelectorParser}

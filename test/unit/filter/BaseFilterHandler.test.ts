@@ -1,9 +1,10 @@
-import { BasicRepresentation, DC, Representation, RepresentationMetadata } from '@solid/community-server';
+import type { Representation } from '@solid/community-server';
+import { BasicRepresentation, DC, RepresentationMetadata } from '@solid/community-server';
 import { BaseFilterHandler } from '../../../src/filter/BaseFilterHandler';
-import { Filter } from '../../../src/filter/Filter';
-import { FilterExecutor } from '../../../src/filter/FilterExecutor';
-import { FilterHandlerInput } from '../../../src/filter/FilterHandler';
-import { FilterParser } from '../../../src/filter/FilterParser';
+import type { Filter } from '../../../src/filter/Filter';
+import type { FilterExecutor } from '../../../src/filter/FilterExecutor';
+import type { FilterHandlerInput } from '../../../src/filter/FilterHandler';
+import type { FilterParser } from '../../../src/filter/FilterParser';
 import { DERIVED } from '../../../src/Vocabularies';
 
 describe('BaseFilterHandler', (): void => {
@@ -61,7 +62,7 @@ describe('BaseFilterHandler', (): void => {
     input.config.metadata.add(DERIVED.terms.selector, 'selector');
     input.config.metadata.add(DERIVED.terms.filter, 'filter');
 
-    let result = await handler.handle(input);
+    const result = await handler.handle(input);
     expect(result).toBe(representation);
     expect(result.metadata.get(DERIVED.terms.selector)?.value).toBe('selector');
     expect(result.metadata.get(DERIVED.terms.filter)?.value).toBe('filter');

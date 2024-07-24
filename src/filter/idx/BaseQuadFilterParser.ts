@@ -1,7 +1,9 @@
-import { Quad } from '@rdfjs/types';
-import { Guarded, transformSafely } from '@solid/community-server';
-import { Readable } from 'node:stream';
-import { QuadFilterParser, QuadFilterParserArgs } from './QuadFilterParser';
+import type { Readable } from 'node:stream';
+import type { Quad } from '@rdfjs/types';
+import type { Guarded } from '@solid/community-server';
+import { transformSafely } from '@solid/community-server';
+import type { QuadFilterParserArgs } from './QuadFilterParser';
+import { QuadFilterParser } from './QuadFilterParser';
 
 /**
  * A {@link QuadFilterParser} that removes all triples from a representation data stream
@@ -9,7 +11,7 @@ import { QuadFilterParser, QuadFilterParserArgs } from './QuadFilterParser';
  */
 export class BaseQuadFilterParser extends QuadFilterParser {
   public async handle({ filter, representation }: QuadFilterParserArgs): Promise<Guarded<Readable>> {
-    const matchFn = (quad: Quad): Quad | undefined => {
+    function matchFn(quad: Quad): Quad | undefined {
       let match: Quad | undefined;
       for (const pos of [ 'subject', 'predicate', 'object', 'graph' ] as const) {
         if (filter[pos]) {
@@ -24,7 +26,7 @@ export class BaseQuadFilterParser extends QuadFilterParser {
     }
 
     const transform = transformSafely(representation.data, {
-      transform: (data: Quad) => {
+      transform: (data: Quad): void => {
         const match = matchFn(data);
         if (match) {
           transform.push(match);

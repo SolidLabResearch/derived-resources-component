@@ -1,5 +1,6 @@
-import { BasicRepresentation, LDP, RepresentationMetadata, ResourceStore } from '@solid/community-server';
-import { DerivationConfig } from '../../../src/DerivationConfig';
+import type { ResourceStore } from '@solid/community-server';
+import { BasicRepresentation, LDP, RepresentationMetadata } from '@solid/community-server';
+import type { DerivationConfig } from '../../../src/DerivationConfig';
 import { GlobSelectorParser } from '../../../src/selector/GlobSelectorParser';
 
 describe('GlobSelectorHandler', (): void => {
@@ -24,7 +25,7 @@ describe('GlobSelectorHandler', (): void => {
     handler = new GlobSelectorParser(store);
   });
 
-  function setMetadata(paths: string[]) {
+  function setMetadata(paths: string[]): void {
     const metadata = new RepresentationMetadata();
     for (const path of paths) {
       metadata.add(LDP.terms.contains, path);
@@ -34,7 +35,7 @@ describe('GlobSelectorHandler', (): void => {
 
   it('returns the path itself if there is no glob.', async(): Promise<void> => {
     input.selectors = [ '/test' ];
-    await expect(handler.handle(input)).resolves.toEqual([ { path: '/test' } ]);
+    await expect(handler.handle(input)).resolves.toEqual([{ path: '/test' }]);
   });
 
   it('does not return a path if it does not exist.', async(): Promise<void> => {
@@ -49,7 +50,7 @@ describe('GlobSelectorHandler', (): void => {
     input.selectors = [ '/*' ];
     await expect(handler.handle(input)).resolves.toEqual([
       { path: '/foo' },
-      { path: '/bar/' }
+      { path: '/bar/' },
     ]);
     expect(store.getRepresentation).toHaveBeenCalledTimes(1);
     expect(store.getRepresentation).toHaveBeenNthCalledWith(1, { path: '/' }, {});
@@ -60,7 +61,7 @@ describe('GlobSelectorHandler', (): void => {
     input.selectors = [ '/*/baz' ];
     await expect(handler.handle(input)).resolves.toEqual([
       { path: '/bar/baz' },
-      { path: '/baz/baz' }
+      { path: '/baz/baz' },
     ]);
     expect(store.getRepresentation).toHaveBeenCalledTimes(1);
     expect(store.getRepresentation).toHaveBeenNthCalledWith(1, { path: '/' }, {});
@@ -71,7 +72,7 @@ describe('GlobSelectorHandler', (): void => {
     input.selectors = [ '/*.js' ];
     await expect(handler.handle(input)).resolves.toEqual([
       { path: '/foo.js' },
-      { path: '/baz.js' }
+      { path: '/baz.js' },
     ]);
   });
 
@@ -79,7 +80,7 @@ describe('GlobSelectorHandler', (): void => {
     setMetadata([ '/foo.js', '/bar.js/', '/foo.py', '/bar.py/' ]);
     input.selectors = [ '/*.js/' ];
     await expect(handler.handle(input)).resolves.toEqual([
-      { path: '/bar.js/' }
+      { path: '/bar.js/' },
     ]);
   });
 
@@ -87,7 +88,7 @@ describe('GlobSelectorHandler', (): void => {
     setMetadata([ '/foo.js', '/bar.js/', '/foo.py', '/bar.py/' ]);
     input.selectors = [ '/*.js/baz' ];
     await expect(handler.handle(input)).resolves.toEqual([
-      { path: '/bar.js/baz' }
+      { path: '/bar.js/baz' },
     ]);
   });
 
@@ -95,7 +96,7 @@ describe('GlobSelectorHandler', (): void => {
     setMetadata([ '/foo.js', '/bar.js', '/foo.py', '/bar.py' ]);
     input.selectors = [ '/f*.js' ];
     await expect(handler.handle(input)).resolves.toEqual([
-      { path: '/foo.js' }
+      { path: '/foo.js' },
     ]);
   });
 
@@ -104,7 +105,7 @@ describe('GlobSelectorHandler', (): void => {
     input.selectors = [ '/**.js' ];
     await expect(handler.handle(input)).resolves.toEqual([
       { path: '/foo.js' },
-      { path: '/baz.js' }
+      { path: '/baz.js' },
     ]);
   });
 
@@ -112,7 +113,7 @@ describe('GlobSelectorHandler', (): void => {
     setMetadata([ '/foo.js', '/bar.js/', '/foo.py', '/bar.py/' ]);
     input.selectors = [ '/**.js/' ];
     await expect(handler.handle(input)).resolves.toEqual([
-      { path: '/bar.js/' }
+      { path: '/bar.js/' },
     ]);
   });
 
@@ -120,7 +121,7 @@ describe('GlobSelectorHandler', (): void => {
     setMetadata([ '/foo.js', '/bar.js/', '/foo.py', '/bar.py/' ]);
     input.selectors = [ '/**.js/baz' ];
     await expect(handler.handle(input)).resolves.toEqual([
-      { path: '/bar.js/baz' }
+      { path: '/bar.js/baz' },
     ]);
   });
 
@@ -128,7 +129,7 @@ describe('GlobSelectorHandler', (): void => {
     setMetadata([ '/foo.js', '/bar.js', '/foo.py', '/bar.py' ]);
     input.selectors = [ '/f**.js' ];
     await expect(handler.handle(input)).resolves.toEqual([
-      { path: '/foo.js' }
+      { path: '/foo.js' },
     ]);
   });
 
