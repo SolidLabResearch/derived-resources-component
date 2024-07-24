@@ -1,5 +1,6 @@
-import { Authorizer, AuthorizerInput } from '@solid/community-server';
-import { CredentialsStorage } from './CredentialsStorage';
+import type { AuthorizerInput } from '@solid/community-server';
+import { Authorizer } from '@solid/community-server';
+import type { CredentialsStorage } from './CredentialsStorage';
 
 /**
  * An {@link Authorizer} that stores the credentials in a {@link CredentialsStorage}.

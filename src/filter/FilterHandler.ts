@@ -1,5 +1,6 @@
-import { AsyncHandler, Representation } from '@solid/community-server';
-import { DerivationConfig } from '../DerivationConfig';
+import type { Representation } from '@solid/community-server';
+import { AsyncHandler } from '@solid/community-server';
+import type { DerivationConfig } from '../DerivationConfig';
 
 export interface FilterHandlerInput {
   /**
@@ -15,4 +16,4 @@ export interface FilterHandlerInput {
 /**
  * Applies a filter to a dataset to generate a derived resource representation.
  */
-export abstract class FilterHandler extends AsyncHandler<FilterHandlerInput, Representation>{}
+export abstract class FilterHandler extends AsyncHandler<FilterHandlerInput, Representation> {}

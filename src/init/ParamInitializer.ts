@@ -1,5 +1,5 @@
 import { createErrorMessage, getLoggerFor, Initializer } from '@solid/community-server';
-import { ParamSetter } from './ParamSetter';
+import type { ParamSetter } from './ParamSetter';
 
 /**
  * Assigns the value for a {@link ParamSetter}.
@@ -15,8 +15,9 @@ export class ParamInitializer<T> extends Initializer {
       paramSetter = [ paramSetter ];
     }
     for (const setter of paramSetter) {
-      setter.setParam(param).catch(error => {
+      setter.setParam(param).catch((error): void => {
         this.logger.error(`Unable to set parameter: ${createErrorMessage(error)}`);
+        // eslint-disable-next-line unicorn/no-process-exit
         process.exit(1);
       });
     }
@@ -24,6 +25,5 @@ export class ParamInitializer<T> extends Initializer {
 
   public async handle(): Promise<void> {
     // Does nothing but we need the function.
-    return;
   }
 }

@@ -1,4 +1,4 @@
-import { RepresentationMetadata, ResourceIdentifier } from '@solid/community-server';
+import type { RepresentationMetadata, ResourceIdentifier } from '@solid/community-server';
 
 /**
  * Describes all the necessary information to derive a resource.

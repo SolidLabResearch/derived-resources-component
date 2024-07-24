@@ -1,14 +1,16 @@
+import type {
+  Representation,
+  ResourceStore,
+} from '@solid/community-server';
 import {
   BasicRepresentation,
   INTERNAL_QUADS,
   MethodNotAllowedHttpError,
   NotFoundHttpError,
-  Representation,
-  ResourceStore,
-  SingleRootIdentifierStrategy
+  SingleRootIdentifierStrategy,
 } from '@solid/community-server';
 import { DataFactory } from 'n3';
-import { DerivationManager } from '../../src/DerivationManager';
+import type { DerivationManager } from '../../src/DerivationManager';
 import { DerivedResourceStore } from '../../src/DerivedResourceStore';
 import namedNode = DataFactory.namedNode;
 
@@ -32,13 +34,13 @@ describe('DerivedResourceStore', (): void => {
       setRepresentation: jest.fn().mockResolvedValue('set'),
       modifyResource: jest.fn().mockResolvedValue('modify'),
       deleteResource: jest.fn().mockResolvedValue('delete'),
-    }
+    };
 
     derivedRepresentation = new BasicRepresentation('derived', identifier, INTERNAL_QUADS);
     manager = {
       getDerivationConfig: jest.fn().mockResolvedValue(config),
       deriveResource: jest.fn().mockResolvedValue(derivedRepresentation),
-    }
+    };
 
     store = new DerivedResourceStore(source, manager, identifierStrategy);
   });
@@ -78,7 +80,7 @@ describe('DerivedResourceStore', (): void => {
 
   it('getRepresentation returns the original representation if there is no config.', async(): Promise<void> => {
     manager.getDerivationConfig.mockResolvedValueOnce(undefined);
-    await expect(store.getRepresentation(identifier, {})).resolves.toBe(representation);
+    await expect(store.getRepresentation(identifier)).resolves.toBe(representation);
     expect(manager.deriveResource).toHaveBeenCalledTimes(0);
   });
 
@@ -86,12 +88,12 @@ describe('DerivedResourceStore', (): void => {
     manager.getDerivationConfig.mockResolvedValueOnce(undefined);
     source.getRepresentation.mockRejectedValueOnce(new NotFoundHttpError());
     source.getRepresentation.mockResolvedValueOnce(new BasicRepresentation('', { path: 'https://example.com/' }));
-    await expect(store.getRepresentation(identifier, {})).rejects.toThrow(NotFoundHttpError);
+    await expect(store.getRepresentation(identifier)).rejects.toThrow(NotFoundHttpError);
     expect(manager.deriveResource).toHaveBeenCalledTimes(0);
   });
 
   it('getRepresentation returns the derived result if there is one.', async(): Promise<void> => {
-    await expect(store.getRepresentation(identifier, {})).resolves.toBe(derivedRepresentation);
+    await expect(store.getRepresentation(identifier)).resolves.toBe(derivedRepresentation);
     expect(manager.deriveResource).toHaveBeenLastCalledWith(identifier, config);
     expect(derivedRepresentation.metadata.contentType).toBe(INTERNAL_QUADS);
     expect(derivedRepresentation.metadata.has(namedNode('knows'), namedNode('someone'))).toBe(true);
@@ -100,7 +102,7 @@ describe('DerivedResourceStore', (): void => {
   it('getRepresentation returns the derived result if the parent metadata contains it.', async(): Promise<void> => {
     source.getRepresentation.mockRejectedValueOnce(new NotFoundHttpError());
     source.getRepresentation.mockResolvedValueOnce(new BasicRepresentation('', { path: 'https://example.com/' }));
-    await expect(store.getRepresentation(identifier, {})).resolves.toBe(derivedRepresentation);
+    await expect(store.getRepresentation(identifier)).resolves.toBe(derivedRepresentation);
     expect(manager.deriveResource).toHaveBeenLastCalledWith(identifier, config);
   });
 

@@ -1,11 +1,11 @@
-import { BasicRepresentation, CONTENT_TYPE, readableToString, RepresentationMetadata } from '@solid/community-server';
-import { LRUCache } from 'lru-cache';
 import { Readable } from 'node:stream';
+import { BasicRepresentation, CONTENT_TYPE, readableToString, RepresentationMetadata } from '@solid/community-server';
 import {
-  CachedRepresentation, representationToCached,
-  calculateCachedRepresentationSize,
   cachedToRepresentation,
-  readStream, duplicateRepresentation
+  calculateCachedRepresentationSize,
+  duplicateRepresentation,
+  readStream,
+  representationToCached,
 } from '../../../src/util/CacheUtil';
 
 describe('CacheUtil', (): void => {
@@ -17,7 +17,7 @@ describe('CacheUtil', (): void => {
 
   describe('#readStream', (): void => {
     it('converts object streams to arrays.', async(): Promise<void> => {
-      await expect(readStream(Readable.from([ 1, 2, 3 ]))).resolves.toEqual([ 1, 2, 3]);
+      await expect(readStream(Readable.from([ 1, 2, 3 ]))).resolves.toEqual([ 1, 2, 3 ]);
     });
 
     it('reads streams into a Buffer.', async(): Promise<void> => {

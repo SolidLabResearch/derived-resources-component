@@ -1,8 +1,10 @@
-import { Quad } from '@rdfjs/types';
-import { BasicRepresentation, DC, guardedStreamFrom, readableToQuads, Representation } from '@solid/community-server';
+import type { Readable } from 'node:stream';
+import type { Quad } from '@rdfjs/types';
+import type { Guarded, Representation } from '@solid/community-server';
+import { BasicRepresentation, DC, guardedStreamFrom, readableToQuads } from '@solid/community-server';
 import { DataFactory } from 'n3';
 import { CachedQuadFilterParser } from '../../../../src/filter/idx/CachedQuadFilterParser';
-import { QuadFilterParser } from '../../../../src/filter/idx/QuadFilterParser';
+import type { QuadFilterParser } from '../../../../src/filter/idx/QuadFilterParser';
 
 async function flushPromises(): Promise<void> {
   // This flushes the promises, causing the cache to be filled
@@ -10,7 +12,7 @@ async function flushPromises(): Promise<void> {
 }
 
 describe('A CachedQuadFilterParser', (): void => {
-  let filter: Partial<Quad> = {
+  const filter: Partial<Quad> = {
     predicate: DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
     object: DataFactory.variable('v'),
   };
@@ -30,7 +32,7 @@ describe('A CachedQuadFilterParser', (): void => {
 
     source = {
       canHandle: jest.fn(),
-      handle: jest.fn(async() => guardedStreamFrom(quads)),
+      handle: jest.fn(async(): Promise<Guarded<Readable>> => guardedStreamFrom(quads)),
     } satisfies Partial<QuadFilterParser> as any;
 
     parser = new CachedQuadFilterParser(source);
@@ -67,7 +69,7 @@ describe('A CachedQuadFilterParser', (): void => {
   });
 
   it('has different cache entries per quad filter.', async(): Promise<void> => {
-    let filter2: Partial<Quad> = { predicate: DataFactory.variable('v') };
+    const filter2: Partial<Quad> = { predicate: DataFactory.variable('v') };
     await parser.handle({ filter, representation });
     await parser.handle({ filter: filter2, representation });
     expect(source.handle).toHaveBeenCalledTimes(2);

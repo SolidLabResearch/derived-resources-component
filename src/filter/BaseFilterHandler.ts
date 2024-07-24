@@ -1,7 +1,9 @@
-import { Representation, updateModifiedDate } from '@solid/community-server';
-import { FilterExecutor } from './FilterExecutor';
-import { FilterHandler, FilterHandlerInput } from './FilterHandler';
-import { FilterParser } from './FilterParser';
+import type { Representation } from '@solid/community-server';
+import { updateModifiedDate } from '@solid/community-server';
+import type { FilterExecutor } from './FilterExecutor';
+import type { FilterHandlerInput } from './FilterHandler';
+import { FilterHandler } from './FilterHandler';
+import type { FilterParser } from './FilterParser';
 
 /**
  * First parses the filter input into a {@link Filter} object,
@@ -27,9 +29,12 @@ export class BaseFilterHandler extends FilterHandler {
     const filter = await this.parser.handle(input.config);
     const result = await this.executor.handleSafe({ ...input, filter });
 
-    // Set the last modified date to the current time, this to prevent issues with ETags not changing if the resource changes.
-    // To generate a correct ETag we would have to consider all input sources, their timestamps, same for the filter, and potential mappings.
-    // CSS currently generates an ETag purely based on the timestamp so some changes would be needed there before we can even think of that.
+    // Set the last modified date to the current time,
+    // this to prevent issues with ETags not changing if the resource changes.
+    // To generate a correct ETag we would have to consider all input sources,
+    // their timestamps, same for the filter, and potential mappings.
+    // CSS currently generates an ETag purely based on the timestamp,
+    // so some changes would be needed there before we can even think of that.
     updateModifiedDate(result.metadata, new Date());
 
     // Add all the derivation metadata

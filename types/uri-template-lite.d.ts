@@ -1,9 +1,10 @@
+/* eslint-disable unicorn/filename-case */
 declare module 'uri-template-lite' {
-  export function expand(template: string, data: { [key: string]: unknown }): string;
+  export function expand(template: string, data: Record<string, unknown>): string;
 
   export default class Template {
-    constructor(template: string);
-    expand: (data: { [key: string]: unknown }) => string;
-    match: (template: string) => { [key: string]: string };
+    public constructor(template: string);
+    public expand: (data: Record<string, unknown>) => string;
+    public match: (template: string) => Record<string, string>;
   }
 }

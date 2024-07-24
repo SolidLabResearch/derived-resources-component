@@ -1,15 +1,17 @@
+import type {
+  IdentifierStrategy,
+  Representation,
+  ResourceStore,
+} from '@solid/community-server';
 import {
   createErrorMessage,
-  IdentifierStrategy,
   InternalServerError,
   isUrl,
   NotImplementedHttpError,
   readableToString,
-  Representation,
-  ResourceStore
 } from '@solid/community-server';
-import { DerivationConfig } from '../DerivationConfig';
-import { Filter } from './Filter';
+import type { DerivationConfig } from '../DerivationConfig';
+import type { Filter } from './Filter';
 import { FilterParser } from './FilterParser';
 
 /**
@@ -30,7 +32,7 @@ export class StringResourceFilterParser extends FilterParser {
     if (!isUrl(input.filter)) {
       throw new NotImplementedHttpError('Only valid URLs are supported as filter value.');
     }
-    if (!this.identifierStrategy.supportsIdentifier({ path: input.filter })){
+    if (!this.identifierStrategy.supportsIdentifier({ path: input.filter })) {
       throw new NotImplementedHttpError(`${input.filter} is not in the scope of the server.`);
     }
   }
@@ -42,12 +44,14 @@ export class StringResourceFilterParser extends FilterParser {
       representation = await this.store.getRepresentation({ path: input.filter }, {});
       filter = await readableToString(representation.data);
     } catch (error: unknown) {
-      throw new InternalServerError(`There was a problem acquiring the filter to generate the derived resource: ${createErrorMessage(error)}`);
+      throw new InternalServerError(
+        `There was a problem acquiring the filter to generate the derived resource: ${createErrorMessage(error)}`,
+      );
     }
 
     return {
       data: filter,
       metadata: representation.metadata,
-    }
+    };
   }
 }

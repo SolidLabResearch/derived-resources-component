@@ -1,5 +1,6 @@
-import { DerivationConfig } from '../DerivationConfig';
-import { DerivationMatcher, DerivationMatcherInput } from './DerivationMatcher';
+import type { DerivationConfig } from '../DerivationConfig';
+import type { DerivationMatcherInput } from './DerivationMatcher';
+import { DerivationMatcher } from './DerivationMatcher';
 
 /**
  * Adds certain preset values to the resulting mappings of another {@link DerivationMatcher}.
@@ -27,7 +28,7 @@ export class PresetDerivationMatcher extends DerivationMatcher {
     };
     return {
       ...result,
-      mappings
+      mappings,
     };
   }
 }

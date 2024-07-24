@@ -5,6 +5,7 @@
 export interface ParamSetter<T> {
   /**
    * Assigns the parameter to the class.
+   *
    * @param param - Parameter to assign.
    */
   setParam: (param: T) => Promise<void>;

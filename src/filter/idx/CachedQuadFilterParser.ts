@@ -1,13 +1,27 @@
-import { Quad } from '@rdfjs/types';
-import { DC, getLoggerFor, Guarded, guardedStreamFrom, InternalServerError, pipeSafely } from '@solid/community-server';
+import type { Readable } from 'node:stream';
+import { PassThrough } from 'node:stream';
+import type { Quad } from '@rdfjs/types';
+import type { Guarded } from '@solid/community-server';
+import { DC, getLoggerFor, guardedStreamFrom, InternalServerError, pipeSafely } from '@solid/community-server';
 import { LRUCache } from 'lru-cache';
-import { PassThrough, Readable } from 'node:stream';
 import { termToString } from 'rdf-string';
-import { QuadFilterParser, QuadFilterParserArgs } from './QuadFilterParser';
+import type { QuadFilterParserArgs } from './QuadFilterParser';
+import { QuadFilterParser } from './QuadFilterParser';
 
 interface CachedQuads {
   quads: Quad[];
   checksum: string;
+}
+
+function sizeCalculation({ quads }: CachedQuads): number {
+  let size = 1;
+  for (const quad of quads) {
+    size += quad.subject.value.length;
+    size += quad.predicate.value.length;
+    size += quad.object.value.length;
+    size += quad.graph.value.length;
+  }
+  return size;
 }
 
 /**
@@ -23,21 +37,12 @@ export class CachedQuadFilterParser extends QuadFilterParser {
   protected readonly source: QuadFilterParser;
   protected readonly cache: LRUCache<string, CachedQuads>;
 
-  public constructor(source: QuadFilterParser, cacheSettings?: { max?: number, maxSize?: number }) {
+  public constructor(source: QuadFilterParser, cacheSettings?: { max?: number; maxSize?: number }) {
     super();
     this.source = source;
     const max = cacheSettings?.max ?? 1000;
-    const maxSize = cacheSettings?.maxSize ?? 100_000_000; // 100MB
-    const sizeCalculation: LRUCache.SizeCalculator<string, CachedQuads> = ({ quads }): number => {
-      let size = 1;
-      for (const quad of quads) {
-        size += quad.subject.value.length;
-        size += quad.predicate.value.length;
-        size += quad.object.value.length;
-        size += quad.graph.value.length;
-      }
-      return size;
-    };
+    // 100MB
+    const maxSize = cacheSettings?.maxSize ?? 100_000_000;
     this.cache = new LRUCache({ max, maxSize, sizeCalculation });
   }
 
@@ -79,7 +84,9 @@ export class CachedQuadFilterParser extends QuadFilterParser {
   protected getChecksum(input: QuadFilterParserArgs): string {
     const timestamp = input.representation.metadata.get(DC.terms.modified)?.value;
     if (!timestamp) {
-      throw new InternalServerError('Index caching is only possible for backends that return a last modified timestamp.');
+      throw new InternalServerError(
+        'Index caching is only possible for backends that return a last modified timestamp.',
+      );
     }
     return timestamp;
   }
@@ -89,10 +96,10 @@ export class CachedQuadFilterParser extends QuadFilterParser {
    */
   protected cacheResult(key: string, checksum: string, data: Readable): void {
     const quads: Quad[] = [];
-    data.on('data', (quad): void => {
+    data.on('data', (quad: Quad): void => {
       quads.push(quad);
     });
-    data.on('end', () => {
+    data.on('end', (): void => {
       this.cache.set(key, { checksum, quads });
     });
   }

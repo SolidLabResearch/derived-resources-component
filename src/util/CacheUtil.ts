@@ -1,12 +1,15 @@
+import type { Readable } from 'node:stream';
+import { PassThrough } from 'node:stream';
+import type {
+  Representation,
+} from '@solid/community-server';
 import {
   BasicRepresentation,
   guardedStreamFrom,
   InternalServerError,
   pipeSafely,
-  Representation,
-  RepresentationMetadata
+  RepresentationMetadata,
 } from '@solid/community-server';
-import { PassThrough, Readable } from 'node:stream';
 
 /**
  * The cached version of a representation.
@@ -52,7 +55,9 @@ export async function readStream(stream: Readable): Promise<Buffer | unknown[]> 
     } else if (Buffer.isBuffer(chunk)) {
       chunks.push(chunk);
     } else {
-      throw new InternalServerError(`Streams that are not in object mode should output Buffers or strings, received ${typeof chunk}`);
+      throw new InternalServerError(
+        `Streams that are not in object mode should output Buffers or strings, received ${typeof chunk}`,
+      );
     }
   }
   return Buffer.concat(chunks);
@@ -91,8 +96,14 @@ export async function representationToCached(representation: Representation): Pr
  * @param representation - Representation do duplicate.
  */
 export function duplicateRepresentation(representation: Representation): [ Representation, Representation ] {
-  const stream1 = pipeSafely(representation.data, new PassThrough({ objectMode: representation.data.readableObjectMode }));
-  const stream2 = pipeSafely(representation.data, new PassThrough({ objectMode: representation.data.readableObjectMode }));
+  const stream1 = pipeSafely(
+    representation.data,
+    new PassThrough({ objectMode: representation.data.readableObjectMode }),
+  );
+  const stream2 = pipeSafely(
+    representation.data,
+    new PassThrough({ objectMode: representation.data.readableObjectMode }),
+  );
   return [
     new BasicRepresentation(stream1, new RepresentationMetadata(representation.metadata)),
     new BasicRepresentation(stream2, new RepresentationMetadata(representation.metadata)),

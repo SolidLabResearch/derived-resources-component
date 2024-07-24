@@ -1,12 +1,16 @@
+import type {
+  AuxiliaryIdentifierStrategy,
+  ChangeMap,
+  Representation,
+  ResourceIdentifier,
+  ResourceStore,
+} from '@solid/community-server';
 import {
   BasicRepresentation,
+  IdentifierMap,
   readableToString,
-  Representation,
   RepresentationMetadata,
-  ResourceStore
 } from '@solid/community-server';
-import { AuxiliaryIdentifierStrategy } from '@solid/community-server/dist/http/auxiliary/AuxiliaryIdentifierStrategy';
-import { IdentifierMap } from '@solid/community-server/dist/util/map/IdentifierMap';
 import { CachedResourceStore } from '../../src/CachedResourceStore';
 
 async function flushPromises(): Promise<void> {
@@ -25,19 +29,25 @@ describe('A CachedResourceStore', (): void => {
   beforeEach(async(): Promise<void> => {
     representation = new BasicRepresentation('pear', identifier, 'text/turtle');
     source = {
+      /* eslint-disable unused-imports/no-unused-vars */
       hasResource: jest.fn().mockResolvedValue(true),
-      getRepresentation: jest.fn(async(...args) =>
+      getRepresentation: jest.fn(async(...args): Promise<BasicRepresentation> =>
         new BasicRepresentation('pear', identifier, 'text/turtle')),
-      addResource: jest.fn(async(id, rep) => new IdentifierMap([[ id, new RepresentationMetadata() ]])),
-      setRepresentation: jest.fn(async(id, rep) => new IdentifierMap([[ id, new RepresentationMetadata() ]])),
-      modifyResource: jest.fn(async(id, rep) => new IdentifierMap([[ id, new RepresentationMetadata() ]])),
-      deleteResource: jest.fn(async(id) => new IdentifierMap([[ id, new RepresentationMetadata() ]])),
-    }
+      addResource: jest.fn(async(id, rep): Promise<ChangeMap> =>
+        new IdentifierMap([[ id, new RepresentationMetadata() ]])),
+      setRepresentation: jest.fn(async(id, rep): Promise<ChangeMap> =>
+        new IdentifierMap([[ id, new RepresentationMetadata() ]])),
+      modifyResource: jest.fn(async(id, rep): Promise<ChangeMap> =>
+        new IdentifierMap([[ id, new RepresentationMetadata() ]])),
+      deleteResource: jest.fn(async(id): Promise<ChangeMap> =>
+        new IdentifierMap([[ id, new RepresentationMetadata() ]])),
+      /* eslint-enable unused-imports/no-unused-vars */
+    };
 
     metadataStrategy = {
-      isAuxiliaryIdentifier: jest.fn((id => id.path.endsWith('.meta'))),
-      getSubjectIdentifier: jest.fn((id => ({ path: id.path.slice(0, -'.meta'.length) }))),
-      getAuxiliaryIdentifier: jest.fn((id => ({ path: id.path + '.meta'}))),
+      isAuxiliaryIdentifier: jest.fn((id): boolean => id.path.endsWith('.meta')),
+      getSubjectIdentifier: jest.fn((id): ResourceIdentifier => ({ path: id.path.slice(0, -'.meta'.length) })),
+      getAuxiliaryIdentifier: jest.fn((id): ResourceIdentifier => ({ path: `${id.path}.meta` })),
       getAuxiliaryIdentifiers: jest.fn(),
     };
 
@@ -86,10 +96,10 @@ describe('A CachedResourceStore', (): void => {
 
   it('invalidates the cache when any of the other functions are successful.', async(): Promise<void> => {
     const calls = [
-      () => store.addResource(identifier, representation),
-      () => store.setRepresentation(identifier, representation),
-      () => store.modifyResource(identifier, representation),
-      () => store.deleteResource(identifier),
+      async(): Promise<ChangeMap> => store.addResource(identifier, representation),
+      async(): Promise<ChangeMap> => store.setRepresentation(identifier, representation),
+      async(): Promise<ChangeMap> => store.modifyResource(identifier, representation),
+      async(): Promise<ChangeMap> => store.deleteResource(identifier),
     ];
     for (const call of calls) {
       source.getRepresentation.mockClear();

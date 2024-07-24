@@ -1,4 +1,4 @@
-import { Credentials, KeyValueStorage, ResourceIdentifier } from '@solid/community-server';
+import type { Credentials, KeyValueStorage, ResourceIdentifier } from '@solid/community-server';
 
 /**
  * A storage that links a {@link ResourceIdentifier} to {@link Credentials}.

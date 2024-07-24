@@ -1,6 +1,6 @@
 import { NotImplementedHttpError, RepresentationMetadata } from '@solid/community-server';
 import { DataFactory } from 'n3';
-import { DerivationMatcher, DerivationMatcherInput } from '../../../src/config/DerivationMatcher';
+import type { DerivationMatcher, DerivationMatcherInput } from '../../../src/config/DerivationMatcher';
 import { PresetDerivationMatcher } from '../../../src/config/PresetDerivationMatcher';
 import namedNode = DataFactory.namedNode;
 
@@ -20,7 +20,7 @@ describe('PresetDerivationMatcher', (): void => {
         mappings: { map: 'ping' },
         selectors: [ 'source' ],
         filter: 'source',
-      })
+      }),
     } satisfies Partial<DerivationMatcher> as any;
 
     manager = new PresetDerivationMatcher(source);

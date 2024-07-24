@@ -26,7 +26,7 @@
       "handlers": [
         {
           "comment": "Set the PermissionReader through an initializer to prevent constructor loops.",
-          "@type" : "ParamInitializer",
+          "@type": "ParamInitializer",
           "paramSetter": { "@id": "urn:solid-server:default:AuthorizedSelectorParser" },
           "param": { "@id": "urn:solid-server:default:PermissionReader" }
         }

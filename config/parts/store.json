@@ -11,7 +11,7 @@
       "metadataStrategy": { "@id": "urn:solid-server:default:MetadataStrategy" },
       "options_inConverter": { "@id": "urn:solid-server:default:RepresentationConverter" },
       "options_outConverter": { "@id": "urn:solid-server:default:UiEnabledConverter" },
-      "source": { "@id":  "urn:solid-server:derived:DerivedResourceStore" }
+      "source": { "@id": "urn:solid-server:derived:DerivedResourceStore" }
     },
     {
       "comment": "The store responsible for generating derived resources.",

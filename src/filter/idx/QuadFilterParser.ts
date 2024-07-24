@@ -1,6 +1,7 @@
-import { Quad } from '@rdfjs/types';
-import { AsyncHandler, Guarded, Representation } from '@solid/community-server';
-import { Readable } from 'node:stream';
+import type { Readable } from 'node:stream';
+import type { Quad } from '@rdfjs/types';
+import type { Guarded, Representation } from '@solid/community-server';
+import { AsyncHandler } from '@solid/community-server';
 
 export interface QuadFilterParserArgs {
   filter: Partial<Quad>;
