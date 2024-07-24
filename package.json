@@ -32,20 +32,20 @@
   "dependencies": {
     "@comunica/query-sparql": "^2.10.2",
     "@rdfjs/types": "^1.1.0",
-    "@solid/community-server": "^7.0.3",
-    "asynciterator": "^3.8.1",
-    "lru-cache": "^10.2.0",
-    "n3": "^1.17.2",
+    "@solid/community-server": "^7.1.0",
+    "asynciterator": "^3.9.0",
+    "lru-cache": "^10.4.3",
+    "n3": "^1.17.4",
     "rdf-string": "^1.6.3",
     "uri-template-lite": "^23.4.0"
   },
   "devDependencies": {
-    "@tsconfig/node18": "^18.2.2",
+    "@tsconfig/node18": "^18.2.4",
     "@types/jest": "^29.5.12",
     "componentsjs-generator": "^3.1.2",
     "jest": "^29.7.0",
     "opinionated-eslint-config": "^0.1.0",
     "rdf-js": "^4.0.2",
-    "ts-jest": "^29.1.2"
+    "ts-jest": "^29.2.3"
   }
 }
