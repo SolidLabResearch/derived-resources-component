@@ -1,9 +1,9 @@
 import type { Quad } from '@rdfjs/types';
 import { BasicRepresentation, INTERNAL_QUADS, readableToQuads } from '@solid/community-server';
 import { DataFactory } from 'n3';
-import { BaseQuadFilterParser } from '../../../../src/filter/idx/BaseQuadFilterParser';
+import { BaseQuadPatternExecutor } from '../../../../src/filter/idx/BaseQuadPatternExecutor';
 
-describe('A BaseQuadFilterParser', (): void => {
+describe('A BaseQuadPatternExecutor', (): void => {
   const filter: Partial<Quad> = {
     predicate: DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
     object: DataFactory.variable('v'),
@@ -18,7 +18,7 @@ describe('A BaseQuadFilterParser', (): void => {
     DataFactory.quad(subject, typeNode, type2),
     DataFactory.quad(subject, otherNode, type1),
   ];
-  const parser = new BaseQuadFilterParser();
+  const parser = new BaseQuadPatternExecutor();
 
   it('filters matching quads from the stream.', async(): Promise<void> => {
     const representation = new BasicRepresentation(quads, INTERNAL_QUADS);

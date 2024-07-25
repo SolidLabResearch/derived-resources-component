@@ -7,9 +7,9 @@ import {
 import { DataFactory, Store } from 'n3';
 import type { FilterExecutorInput } from '../../../src/filter/FilterExecutor';
 import type { N3FilterExecutor } from '../../../src/filter/N3FilterExecutor';
-import { RdfFilterExecutor } from '../../../src/filter/RdfFilterExecutor';
+import { StoreDataFilterExecutor } from '../../../src/filter/StoreDataFilterExecutor';
 
-describe('RdfFilterExecutor', (): void => {
+describe('StoreDataFilterExecutor', (): void => {
   const representation = 'representation';
   const quad1 = DataFactory.quad(
     DataFactory.namedNode('s1'),
@@ -23,7 +23,7 @@ describe('RdfFilterExecutor', (): void => {
   );
   let input: FilterExecutorInput;
   let source: jest.Mocked<N3FilterExecutor>;
-  let executor: RdfFilterExecutor;
+  let executor: StoreDataFilterExecutor;
 
   beforeEach(async(): Promise<void> => {
     input = {
@@ -49,7 +49,7 @@ describe('RdfFilterExecutor', (): void => {
       handle: jest.fn().mockResolvedValue(representation),
     } satisfies Partial<N3FilterExecutor> as any;
 
-    executor = new RdfFilterExecutor(source);
+    executor = new StoreDataFilterExecutor(source);
   });
 
   it('rejects non-RDF representations.', async(): Promise<void> => {
