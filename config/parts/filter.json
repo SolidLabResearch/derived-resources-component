@@ -9,9 +9,12 @@
       "@type": "BaseFilterHandler",
       "parser": {
         "@id": "urn:solid-server:default:FilterParser",
-        "@type": "StringResourceFilterParser",
+        "@type": "ResourceFilterParser",
         "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
-        "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" }
+        "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+        "parser": {
+          "@type": "InputFilterParser"
+        }
       },
       "executor": {
         "@id": "urn:solid-server:default:FilterExecutor",

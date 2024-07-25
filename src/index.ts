@@ -17,11 +17,12 @@ export * from './filter/Filter';
 export * from './filter/FilterExecutor';
 export * from './filter/FilterHandler';
 export * from './filter/FilterParser';
+export * from './filter/InputFilterParser';
 export * from './filter/MappingFilterExecutor';
 export * from './filter/N3FilterExecutor';
+export * from './filter/ResourceFilterParser';
 export * from './filter/SparqlFilterExecutor';
 export * from './filter/StoreDataFilterExecutor';
-export * from './filter/StringResourceFilterParser';
 
 export * from './init/ParamInitializer';
 export * from './init/ParamSetter';

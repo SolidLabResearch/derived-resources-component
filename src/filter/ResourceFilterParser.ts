@@ -15,17 +15,17 @@ import type { Filter } from './Filter';
 import { FilterParser } from './FilterParser';
 
 /**
- * Extracts string data from a filter that is an internal URL.
- * Only supports URLs in scope of the server as it uses the internal {@link ResourceStore}.
+ * Interprets the filter string from a {@link DerivationConfig} as the URL of a resource.
+ * The contents of that resource will then be passed along to the next parser.
+ * Only supports resources stored in the given {@link ResourceStore}.g
  */
-export class StringResourceFilterParser extends FilterParser {
-  protected readonly store: ResourceStore;
-  protected readonly identifierStrategy: IdentifierStrategy;
-
-  public constructor(store: ResourceStore, identifierStrategy: IdentifierStrategy) {
+export class ResourceFilterParser<T = unknown> extends FilterParser<T> {
+  public constructor(
+    protected readonly parser: FilterParser<T>,
+    protected readonly store: ResourceStore,
+    protected readonly identifierStrategy: IdentifierStrategy,
+  ) {
     super();
-    this.store = store;
-    this.identifierStrategy = identifierStrategy;
   }
 
   public async canHandle(input: DerivationConfig): Promise<void> {
@@ -37,20 +37,28 @@ export class StringResourceFilterParser extends FilterParser {
     }
   }
 
-  public async handle(input: DerivationConfig): Promise<Filter> {
+  public async handle(input: DerivationConfig): Promise<Filter<T>> {
     let representation: Representation;
-    let filter: string;
+    let filterData: string;
     try {
       representation = await this.store.getRepresentation({ path: input.filter }, {});
-      filter = await readableToString(representation.data);
+      filterData = await readableToString(representation.data);
     } catch (error: unknown) {
       throw new InternalServerError(
         `There was a problem acquiring the filter to generate the derived resource: ${createErrorMessage(error)}`,
       );
     }
 
+    const filter = await this.parser.handleSafe({
+      ...input,
+      filter: filterData,
+    });
+
+    filter.metadata.identifier = representation.metadata.identifier;
+    representation.metadata.setMetadata(filter.metadata);
+
     return {
-      data: filter,
+      data: filter.data,
       metadata: representation.metadata,
     };
   }
