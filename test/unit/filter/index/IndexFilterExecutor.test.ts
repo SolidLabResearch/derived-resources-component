@@ -12,7 +12,7 @@ import {
 import { DataFactory } from 'n3';
 import type { FilterExecutorInput } from '../../../../src/filter/FilterExecutor';
 import { IndexFilterExecutor } from '../../../../src/filter/idx/IndexFilterExecutor';
-import type { QuadFilterParser } from '../../../../src/filter/idx/QuadFilterParser';
+import type { QuadPatternExecutor } from '../../../../src/filter/idx/QuadPatternExecutor';
 import { DERIVED_INDEX } from '../../../../src/Vocabularies';
 
 describe('IndexFilterExecutor', (): void => {
@@ -32,7 +32,7 @@ describe('IndexFilterExecutor', (): void => {
       value: 'v',
     },
   };
-  let resourceIndexParser: jest.Mocked<QuadFilterParser>;
+  let resourceIndexParser: jest.Mocked<QuadPatternExecutor>;
   let input: FilterExecutorInput;
   let executor: IndexFilterExecutor;
 
@@ -71,7 +71,7 @@ describe('IndexFilterExecutor', (): void => {
         }
         return guardedStreamFrom(quads2);
       }),
-    } satisfies Partial<QuadFilterParser> as any;
+    } satisfies Partial<QuadPatternExecutor> as any;
 
     executor = new IndexFilterExecutor(resourceIndexParser);
   });

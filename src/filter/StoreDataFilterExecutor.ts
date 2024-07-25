@@ -9,7 +9,7 @@ import type { N3FilterExecutor } from './N3FilterExecutor';
 /**
  * Converts the input quad streams into a single N3.js store and calls an {@link N3FilterExecutor}.
  */
-export class RdfFilterExecutor extends FilterExecutor {
+export class StoreDataFilterExecutor extends FilterExecutor {
   protected readonly source: N3FilterExecutor;
 
   public constructor(source: N3FilterExecutor) {

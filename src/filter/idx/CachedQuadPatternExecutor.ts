@@ -5,8 +5,8 @@ import type { Guarded } from '@solid/community-server';
 import { DC, getLoggerFor, guardedStreamFrom, InternalServerError, pipeSafely } from '@solid/community-server';
 import { LRUCache } from 'lru-cache';
 import { termToString } from 'rdf-string';
-import type { QuadFilterParserArgs } from './QuadFilterParser';
-import { QuadFilterParser } from './QuadFilterParser';
+import type { QuadPatternExecutorArgs } from './QuadPatternExecutor';
+import { QuadPatternExecutor } from './QuadPatternExecutor';
 
 interface CachedQuads {
   quads: Quad[];
@@ -25,19 +25,19 @@ function sizeCalculation({ quads }: CachedQuads): number {
 }
 
 /**
- * A {@link QuadFilterParser} that caches results.
+ * A {@link QuadPatternExecutor} that caches results.
  * The identifier, the last time the resource was modified and the filter are combined to generate a checksum.
  * If the checksum of the cached entry no longer matches, it will be replaced with the current version
  *
  * Cache settings can be set to determine the max cache entries, or the max size for the entire cache (in bytes).
  */
-export class CachedQuadFilterParser extends QuadFilterParser {
+export class CachedQuadPatternExecutor extends QuadPatternExecutor {
   protected readonly logger = getLoggerFor(this);
 
-  protected readonly source: QuadFilterParser;
+  protected readonly source: QuadPatternExecutor;
   protected readonly cache: LRUCache<string, CachedQuads>;
 
-  public constructor(source: QuadFilterParser, cacheSettings?: { max?: number; maxSize?: number }) {
+  public constructor(source: QuadPatternExecutor, cacheSettings?: { max?: number; maxSize?: number }) {
     super();
     this.source = source;
     const max = cacheSettings?.max ?? 1000;
@@ -46,11 +46,11 @@ export class CachedQuadFilterParser extends QuadFilterParser {
     this.cache = new LRUCache({ max, maxSize, sizeCalculation });
   }
 
-  public async canHandle(input: QuadFilterParserArgs): Promise<void> {
+  public async canHandle(input: QuadPatternExecutorArgs): Promise<void> {
     return this.source.canHandle(input);
   }
 
-  public async handle(input: QuadFilterParserArgs): Promise<Guarded<Readable>> {
+  public async handle(input: QuadPatternExecutorArgs): Promise<Guarded<Readable>> {
     const key = this.getKey(input);
     const checksum = this.getChecksum(input);
     this.logger.debug(`Checking cache with key ${key} and checksum ${checksum}`);
@@ -70,7 +70,7 @@ export class CachedQuadFilterParser extends QuadFilterParser {
   /**
    * Generates the key based on the identifier/filter.
    */
-  protected getKey(input: QuadFilterParserArgs): string {
+  protected getKey(input: QuadPatternExecutorArgs): string {
     const subject = termToString(input.filter.subject);
     const predicate = termToString(input.filter.predicate);
     const object = termToString(input.filter.object);
@@ -81,7 +81,7 @@ export class CachedQuadFilterParser extends QuadFilterParser {
   /**
    * Generates the checksum based on the timestamp.
    */
-  protected getChecksum(input: QuadFilterParserArgs): string {
+  protected getChecksum(input: QuadPatternExecutorArgs): string {
     const timestamp = input.representation.metadata.get(DC.terms.modified)?.value;
     if (!timestamp) {
       throw new InternalServerError(

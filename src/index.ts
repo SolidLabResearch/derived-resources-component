@@ -6,14 +6,13 @@ export * from './credentials/CredentialsStorage';
 export * from './credentials/StoreCredentialsAuthorizer';
 export * from './credentials/WeakStorage';
 
-export * from './filter/idx/BaseQuadFilterParser';
-export * from './filter/idx/CachedQuadFilterParser';
+export * from './filter/idx/BaseQuadPatternExecutor';
+export * from './filter/idx/CachedQuadPatternExecutor';
 export * from './filter/idx/IndexFilterExecutor';
-export * from './filter/idx/QuadFilterParser';
+export * from './filter/idx/QuadPatternExecutor';
 
 export * from './filter/BaseFilterHandler';
 export * from './filter/CachedFilterExecutor';
-export * from './filter/RdfFilterExecutor';
 export * from './filter/Filter';
 export * from './filter/FilterExecutor';
 export * from './filter/FilterHandler';
@@ -21,6 +20,7 @@ export * from './filter/FilterParser';
 export * from './filter/MappingFilterExecutor';
 export * from './filter/N3FilterExecutor';
 export * from './filter/SparqlFilterExecutor';
+export * from './filter/StoreDataFilterExecutor';
 export * from './filter/StringResourceFilterParser';
 
 export * from './init/ParamInitializer';

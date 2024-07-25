@@ -28,13 +28,13 @@
                 "@type": "IndexFilterExecutor",
                 "resourceIndexParser": {
                   "@id": "urn:solid-server:default:CachedResourceIndexParser",
-                  "@type": "CachedQuadFilterParser",
-                  "source": { "@type": "BaseQuadFilterParser" }
+                  "@type": "CachedQuadPatternExecutor",
+                  "source": { "@type": "BaseQuadPatternExecutor" }
                 }
               },
               {
-                "@id": "urn:solid-server:default:RdfFilterExecutor",
-                "@type": "RdfFilterExecutor",
+                "@id": "urn:solid-server:default:StoreDataFilterExecutor",
+                "@type": "StoreDataFilterExecutor",
                 "source": { "@type": "SparqlFilterExecutor" }
               }
             ]

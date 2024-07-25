@@ -16,7 +16,7 @@ import { DataFactory, Store } from 'n3';
 import { DERIVED_INDEX } from '../../Vocabularies';
 import type { FilterExecutorInput } from '../FilterExecutor';
 import { FilterExecutor } from '../FilterExecutor';
-import type { QuadFilterParser } from './QuadFilterParser';
+import type { QuadPatternExecutor } from './QuadPatternExecutor';
 
 const EXPECTED_KEYS = [ 'subject', 'predicate', 'object', 'graph' ] as const;
 
@@ -29,9 +29,9 @@ const EXPECTED_KEYS = [ 'subject', 'predicate', 'object', 'graph' ] as const;
  * and which value was in the variable position.
  */
 export class IndexFilterExecutor extends FilterExecutor {
-  protected readonly resourceIndexParser: QuadFilterParser;
+  protected readonly resourceIndexParser: QuadPatternExecutor;
 
-  public constructor(resourceIndexParser: QuadFilterParser) {
+  public constructor(resourceIndexParser: QuadPatternExecutor) {
     super();
     this.resourceIndexParser = resourceIndexParser;
   }

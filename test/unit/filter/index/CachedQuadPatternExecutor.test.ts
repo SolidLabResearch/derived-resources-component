@@ -3,15 +3,15 @@ import type { Quad } from '@rdfjs/types';
 import type { Guarded, Representation } from '@solid/community-server';
 import { BasicRepresentation, DC, guardedStreamFrom, readableToQuads } from '@solid/community-server';
 import { DataFactory } from 'n3';
-import { CachedQuadFilterParser } from '../../../../src/filter/idx/CachedQuadFilterParser';
-import type { QuadFilterParser } from '../../../../src/filter/idx/QuadFilterParser';
+import { CachedQuadPatternExecutor } from '../../../../src/filter/idx/CachedQuadPatternExecutor';
+import type { QuadPatternExecutor } from '../../../../src/filter/idx/QuadPatternExecutor';
 
 async function flushPromises(): Promise<void> {
   // This flushes the promises, causing the cache to be filled
   await new Promise(jest.requireActual('timers').setImmediate);
 }
 
-describe('A CachedQuadFilterParser', (): void => {
+describe('A CachedQuadPatternExecutor', (): void => {
   const filter: Partial<Quad> = {
     predicate: DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
     object: DataFactory.variable('v'),
@@ -23,8 +23,8 @@ describe('A CachedQuadFilterParser', (): void => {
     DataFactory.quad(subject, typeNode, DataFactory.namedNode('http://xmlns.com/foaf/0.1/Person')),
   ];
   let representation: Representation;
-  let source: jest.Mocked<QuadFilterParser>;
-  let parser: CachedQuadFilterParser;
+  let source: jest.Mocked<QuadPatternExecutor>;
+  let parser: CachedQuadPatternExecutor;
 
   beforeEach(async(): Promise<void> => {
     representation = new BasicRepresentation();
@@ -33,9 +33,9 @@ describe('A CachedQuadFilterParser', (): void => {
     source = {
       canHandle: jest.fn(),
       handle: jest.fn(async(): Promise<Guarded<Readable>> => guardedStreamFrom(quads)),
-    } satisfies Partial<QuadFilterParser> as any;
+    } satisfies Partial<QuadPatternExecutor> as any;
 
-    parser = new CachedQuadFilterParser(source);
+    parser = new CachedQuadPatternExecutor(source);
   });
 
   it('can handle input its source can handle.', async(): Promise<void> => {
