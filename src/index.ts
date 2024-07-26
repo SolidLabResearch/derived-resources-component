@@ -20,7 +20,9 @@ export * from './filter/FilterParser';
 export * from './filter/InputFilterParser';
 export * from './filter/MappingFilterParser';
 export * from './filter/N3FilterExecutor';
+export * from './filter/QuadFilterParser';
 export * from './filter/ResourceFilterParser';
+export * from './filter/ShaclFilterExecutor';
 export * from './filter/SparqlFilterExecutor';
 export * from './filter/StoreDataFilterExecutor';
 

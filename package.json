@@ -37,6 +37,7 @@
     "lru-cache": "^10.4.3",
     "n3": "^1.17.4",
     "rdf-string": "^1.6.3",
+    "rdf-validate-shacl": "^0.4.5",
     "uri-template-lite": "^23.4.0"
   },
   "devDependencies": {
