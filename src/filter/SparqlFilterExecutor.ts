@@ -20,7 +20,7 @@ import { N3FilterExecutor } from './N3FilterExecutor';
 /**
  * Applies a SPARQL filter to an N3.js store.
  */
-export class SparqlFilterExecutor extends N3FilterExecutor {
+export class SparqlFilterExecutor extends N3FilterExecutor<string> {
   protected readonly logger = getLoggerFor(this);
   protected readonly engine: QueryEngine;
 

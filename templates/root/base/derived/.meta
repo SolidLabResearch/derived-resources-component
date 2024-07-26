@@ -48,3 +48,10 @@
         derived:selector <../data/container/data1>, <../data/container/data2>;
         derived:filter <../filters/name>
     ].
+
+<>
+    derived:derivedResource [
+        derived:template "shacl";
+        derived:selector <../data/container/*>;
+        derived:filter <../filters/shacl>
+    ].

@@ -20,7 +20,11 @@
         "@id": "urn:solid-server:default:MappingFilterParser",
         "@type": "MappingFilterParser",
         "source": {
-          "@type": "InputFilterParser"
+          "@type": "WaterfallHandler",
+          "handlers": [
+            { "@type": "QuadFilterParser" },
+            { "@type": "InputFilterParser" }
+          ]
         }
       }
     },
@@ -45,7 +49,11 @@
             "@id": "urn:solid-server:default:StoreDataFilterExecutor",
             "@type": "StoreDataFilterExecutor",
             "source": {
-              "@type": "SparqlFilterExecutor"
+              "@type": "WaterfallHandler",
+              "handlers": [
+                { "@type": "SparqlFilterExecutor" },
+                { "@type": "ShaclFilterExecutor" }
+              ]
             }
           }
         ]

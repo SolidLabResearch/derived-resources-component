@@ -18,3 +18,19 @@ export const DERIVED_INDEX = createVocabulary(
   'for',
   'instance',
 );
+
+export const SH = createVocabulary(
+  'http://www.w3.org/ns/shacl#',
+  'property',
+  'path',
+  'node',
+
+  // Validation report
+  'focusNode',
+
+  // Focus node
+  'targetNode',
+  'targetClass',
+  'targetSubjectsOf',
+  'targetObjectsOf',
+);

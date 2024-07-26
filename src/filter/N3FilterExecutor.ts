@@ -22,4 +22,4 @@ export interface N3FilterExecutorInput<T = unknown> {
 /**
  * Similar to a {@link FilterExecutor} but takes an N3.js store as input instead.
  */
-export abstract class N3FilterExecutor extends AsyncHandler<N3FilterExecutorInput, Representation> {}
+export abstract class N3FilterExecutor<T = unknown> extends AsyncHandler<N3FilterExecutorInput<T>, Representation> {}

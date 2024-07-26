@@ -53,7 +53,7 @@ describe('The server test setup', (): void => {
   it('returns the contents of the derived root container.', async(): Promise<void> => {
     const res = await fetch('http://localhost:3456/derived/');
     const store = await responseToStore(res, 'http://localhost:3456/derived/');
-    expect(store.countQuads(null, null, null, null)).toBe(5);
+    expect(store.countQuads(null, null, null, null)).toBe(6);
     const subject = namedNode('http://localhost:3456/derived/');
     const contains = namedNode('http://www.w3.org/ns/ldp#contains');
     expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/test'), null)).toBe(1);
@@ -61,6 +61,7 @@ describe('The server test setup', (): void => {
     expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/query%7B?var%7D'), null)).toBe(1);
     expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/pattern'), null)).toBe(1);
     expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/multiple'), null)).toBe(1);
+    expect(store.countQuads(subject, contains, namedNode('http://localhost:3456/derived/shacl'), null)).toBe(1);
   });
 
   it('still returns original resources.', async(): Promise<void> => {
