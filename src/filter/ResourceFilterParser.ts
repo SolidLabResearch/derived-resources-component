@@ -21,7 +21,7 @@ import { FilterParser } from './FilterParser';
  */
 export class ResourceFilterParser<T = unknown> extends FilterParser<T> {
   public constructor(
-    protected readonly parser: FilterParser<T>,
+    protected readonly source: FilterParser<T>,
     protected readonly store: ResourceStore,
     protected readonly identifierStrategy: IdentifierStrategy,
   ) {
@@ -49,7 +49,7 @@ export class ResourceFilterParser<T = unknown> extends FilterParser<T> {
       );
     }
 
-    const filter = await this.parser.handleSafe({
+    const filter = await this.source.handleSafe({
       ...input,
       filter: filterData,
     });
