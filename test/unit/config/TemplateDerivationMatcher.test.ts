@@ -7,6 +7,10 @@ import namedNode = DataFactory.namedNode;
 
 describe('TemplateDerivationMatcher', (): void => {
   const identifier = { path: 'https://example.com/foo' };
+  const queryIdentifier = {
+    ...identifier,
+    query: { a: 'b', c: 'd' },
+  };
   const subject = namedNode('subject');
   const selector = 'selector';
   const filter = 'filter';
@@ -76,6 +80,21 @@ describe('TemplateDerivationMatcher', (): void => {
     expect(result).toEqual(expect.objectContaining({
       identifier,
       mappings: { var: 'foo' },
+      selectors: [ selector ],
+      filter,
+    }));
+    expect(result.metadata.quads()).toHaveLength(3);
+    expect(result.metadata.identifier).toBe(subject);
+  });
+
+  it('extracts query parameters from the template URI.', async(): Promise<void> => {
+    metadata.removeQuad(subject, DERIVED.terms.template, 'foo');
+    metadata.addQuad(subject, DERIVED.terms.template, 'foo{?a,c}');
+    await expect(matcher.canHandle({ identifier: queryIdentifier, subject, metadata })).resolves.toBeUndefined();
+    const result = await matcher.handle({ identifier: queryIdentifier, subject, metadata });
+    expect(result).toEqual(expect.objectContaining({
+      identifier: queryIdentifier,
+      mappings: { a: 'b', c: 'd' },
       selectors: [ selector ],
       filter,
     }));

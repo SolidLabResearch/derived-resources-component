@@ -42,4 +42,6 @@ export * from './CachedResourceStore';
 export * from './DerivationConfig';
 export * from './DerivationManager';
 export * from './DerivedResourceStore';
+export * from './QueryResourceIdentifier';
+export * from './QueryTargetExtractor';
 export * from './Vocabularies';

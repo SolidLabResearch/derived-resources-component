@@ -147,7 +147,7 @@ so it stays in the cache until it gets dropped because the cache is full.
   Note that this allows users to access data they do not have access to if they guess the URL of such data.
   We might want to implement it so creating a derived resource requires read access on all selectors,
   similar to notifications.
-  This could be done by adding a new `PermissionReader` that checks the contents of a PATCH for such triples.
+  This can be enabled as seen [here](derived-index.md).
 - An extra conversion store is added to the config as the new `ResourceStore` needs to do content negotiation
   on data it receives from the backend,
   but also wants to allow content negotiation on the data stream it generates.
@@ -155,5 +155,3 @@ so it stays in the cache until it gets dropped because the cache is full.
   If necessary, the solution could be changed to remove that metadata on GET requests.
 - The filter triple could be extended to also allow the value directly in the object instead of being in a separate resource.
 - The filter could be extended to also support external URIs.
-- To make URI templates with query parameters work, query parameters are not stripped from incoming URLs.
-  For standard, non-derived, resources this can cause issues if an unexpected query parameter is part of the URL.

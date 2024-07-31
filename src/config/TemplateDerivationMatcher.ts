@@ -10,12 +10,16 @@ import {
 } from '@solid/community-server';
 import Template from 'uri-template-lite';
 import type { DerivationConfig } from '../DerivationConfig';
+import { isQueryResourceIdentifier } from '../QueryResourceIdentifier';
 import { DERIVED } from '../Vocabularies';
 import type { DerivationMatcherInput } from './DerivationMatcher';
 import { DerivationMatcher } from './DerivationMatcher';
 
 /**
  * Finds a matching derivation by matching the identifier to a template string.
+ *
+ * Already generates the result in the `canHandle` call and stores it in a {@link WeakMap}
+ * to prevent double work.
  */
 export class TemplateDerivationMatcher extends DerivationMatcher {
   protected logger = getLoggerFor(this);
@@ -28,8 +32,17 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
   }
 
   public async canHandle({ identifier, metadata, subject }: DerivationMatcherInput): Promise<void> {
+    // Add query params so template match can be checked
+    let path = identifier.path;
+    if (isQueryResourceIdentifier(identifier)) {
+      const url = new URL(path);
+      for (const [ key, value ] of Object.entries(identifier.query)) {
+        url.searchParams.append(key, value);
+      }
+      path = url.toString();
+    }
     // Templates are relative to the resource they are linked to
-    const relative = identifier.path.slice(metadata.identifier.value.length);
+    const relative = path.slice(metadata.identifier.value.length);
     if (!this.isValidDerivedSubject(subject)) {
       throw new NotImplementedHttpError();
     }
