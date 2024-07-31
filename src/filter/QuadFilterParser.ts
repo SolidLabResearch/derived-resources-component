@@ -10,7 +10,11 @@ import type { DerivationConfig } from '../DerivationConfig';
 import type { Filter } from './Filter';
 import { FilterParser } from './FilterParser';
 
-// TODO:
+/**
+ * Interprets the config filter string as turtle and parses it into an N3.js store.
+ * Parsing already happens in the `canHandle` call as the parsing is used to verify if the input is valid turtle.
+ * The intermediate result is stored in a {@link WeakMap} to return on the `handle` call.
+ */
 export class QuadFilterParser extends FilterParser<Store> {
   protected readonly logger = getLoggerFor(this);
 
