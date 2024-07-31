@@ -31,7 +31,7 @@ describe('MappingFilterParser', (): void => {
 
   it('applies mappings to the filter.', async(): Promise<void> => {
     await expect(parser.handle(config)).resolves.toBe(filter);
-    expect(source.handle).toHaveBeenLastCalledWith({
+    expect(source.handleSafe).toHaveBeenLastCalledWith({
       ...config,
       filter: 'string with value in it',
     });
