@@ -1,6 +1,6 @@
 import { InternalServerError, NotImplementedHttpError, RepresentationMetadata } from '@solid/community-server';
-import type { DerivationConfig } from '../../../src/DerivationConfig';
-import { QuadFilterParser } from '../../../src/filter/QuadFilterParser';
+import type { DerivationConfig } from '../../../../src/DerivationConfig';
+import { QuadFilterParser } from '../../../../src/filter/parser/QuadFilterParser';
 
 describe('QuadFilterParser', (): void => {
   let config: DerivationConfig;

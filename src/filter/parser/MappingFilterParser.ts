@@ -1,6 +1,6 @@
 import { getLoggerFor } from '@solid/community-server';
-import type { DerivationConfig } from '../DerivationConfig';
-import type { Filter } from './Filter';
+import type { DerivationConfig } from '../../DerivationConfig';
+import type { Filter } from '../Filter';
 import { FilterParser } from './FilterParser';
 
 /**

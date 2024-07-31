@@ -11,17 +11,18 @@ export * from './filter/idx/CachedQuadPatternExecutor';
 export * from './filter/idx/IndexFilterExecutor';
 export * from './filter/idx/QuadPatternExecutor';
 
+export * from './filter/parser/FilterParser';
+export * from './filter/parser/InputFilterParser';
+export * from './filter/parser/MappingFilterParser';
+export * from './filter/parser/QuadFilterParser';
+export * from './filter/parser/ResourceFilterParser';
+
 export * from './filter/BaseFilterHandler';
 export * from './filter/CachedFilterExecutor';
 export * from './filter/Filter';
 export * from './filter/FilterExecutor';
 export * from './filter/FilterHandler';
-export * from './filter/FilterParser';
-export * from './filter/InputFilterParser';
-export * from './filter/MappingFilterParser';
 export * from './filter/N3FilterExecutor';
-export * from './filter/QuadFilterParser';
-export * from './filter/ResourceFilterParser';
 export * from './filter/ShaclFilterExecutor';
 export * from './filter/SparqlFilterExecutor';
 export * from './filter/StoreDataFilterExecutor';
