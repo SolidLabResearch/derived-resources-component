@@ -1,6 +1,6 @@
 import { RepresentationMetadata } from '@solid/community-server';
-import type { DerivationConfig } from '../../../src/DerivationConfig';
-import { InputFilterParser } from '../../../src/filter/InputFilterParser';
+import type { DerivationConfig } from '../../../../src/DerivationConfig';
+import { InputFilterParser } from '../../../../src/filter/parser/InputFilterParser';
 
 describe('InputFilterParser', (): void => {
   let config: DerivationConfig;

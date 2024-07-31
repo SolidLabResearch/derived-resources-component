@@ -4,7 +4,7 @@ import { BaseFilterHandler } from '../../../src/filter/BaseFilterHandler';
 import type { Filter } from '../../../src/filter/Filter';
 import type { FilterExecutor } from '../../../src/filter/FilterExecutor';
 import type { FilterHandlerInput } from '../../../src/filter/FilterHandler';
-import type { FilterParser } from '../../../src/filter/FilterParser';
+import type { FilterParser } from '../../../src/filter/parser/FilterParser';
 import { DERIVED } from '../../../src/Vocabularies';
 
 describe('BaseFilterHandler', (): void => {

@@ -3,7 +3,7 @@ import { updateModifiedDate } from '@solid/community-server';
 import type { FilterExecutor } from './FilterExecutor';
 import type { FilterHandlerInput } from './FilterHandler';
 import { FilterHandler } from './FilterHandler';
-import type { FilterParser } from './FilterParser';
+import type { FilterParser } from './parser/FilterParser';
 
 /**
  * First parses the filter input into a {@link Filter} object,

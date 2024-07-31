@@ -1,8 +1,8 @@
 import { RepresentationMetadata } from '@solid/community-server';
-import type { DerivationConfig } from '../../../src/DerivationConfig';
-import type { Filter } from '../../../src/filter/Filter';
-import type { FilterParser } from '../../../src/filter/FilterParser';
-import { MappingFilterParser } from '../../../src/filter/MappingFilterParser';
+import type { DerivationConfig } from '../../../../src/DerivationConfig';
+import type { Filter } from '../../../../src/filter/Filter';
+import type { FilterParser } from '../../../../src/filter/parser/FilterParser';
+import { MappingFilterParser } from '../../../../src/filter/parser/MappingFilterParser';
 
 describe('MappingFilterParser', (): void => {
   const filter: Filter<string> = {

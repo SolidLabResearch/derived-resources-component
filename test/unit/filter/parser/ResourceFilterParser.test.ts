@@ -5,9 +5,9 @@ import {
   RepresentationMetadata,
   SingleRootIdentifierStrategy,
 } from '@solid/community-server';
-import type { DerivationConfig } from '../../../src/DerivationConfig';
-import type { FilterParser } from '../../../src/filter/FilterParser';
-import { ResourceFilterParser } from '../../../src/filter/ResourceFilterParser';
+import type { DerivationConfig } from '../../../../src/DerivationConfig';
+import type { FilterParser } from '../../../../src/filter/parser/FilterParser';
+import { ResourceFilterParser } from '../../../../src/filter/parser/ResourceFilterParser';
 
 describe('ResourceFilterParser', (): void => {
   let config: DerivationConfig;
