@@ -13,6 +13,14 @@ export const DERIVED = createVocabulary(
   'ReadableSources',
 );
 
+export const DERIVED_TYPES = createVocabulary(
+  'urn:npm:solid:derived-resources:types:',
+  'Shacl',
+  'Store',
+  'String',
+  'QuadPattern',
+);
+
 export const DERIVED_INDEX = createVocabulary(
   'urn:npm:solid:derived-index:',
   'for',
