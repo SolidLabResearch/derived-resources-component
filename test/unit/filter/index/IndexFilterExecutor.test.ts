@@ -1,11 +1,12 @@
 import type { Readable } from 'node:stream';
+import type { Quad } from '@rdfjs/types';
 import type { Guarded } from '@solid/community-server';
 import {
   BasicRepresentation,
-  CONTENT_TYPE,
   guardedStreamFrom,
   INTERNAL_QUADS,
   NotImplementedHttpError,
+  RDF,
   readableToQuads,
   RepresentationMetadata,
 } from '@solid/community-server';
@@ -13,7 +14,7 @@ import { DataFactory } from 'n3';
 import type { FilterExecutorInput } from '../../../../src/filter/FilterExecutor';
 import { IndexFilterExecutor } from '../../../../src/filter/idx/IndexFilterExecutor';
 import type { QuadPatternExecutor } from '../../../../src/filter/idx/QuadPatternExecutor';
-import { DERIVED_INDEX } from '../../../../src/Vocabularies';
+import { DERIVED_INDEX, DERIVED_TYPES } from '../../../../src/Vocabularies';
 
 describe('IndexFilterExecutor', (): void => {
   const subject = DataFactory.namedNode('subject');
@@ -31,9 +32,9 @@ describe('IndexFilterExecutor', (): void => {
       termType: 'Variable',
       value: 'v',
     },
-  };
+  } as Partial<Quad>;
   let resourceIndexParser: jest.Mocked<QuadPatternExecutor>;
-  let input: FilterExecutorInput;
+  let input: FilterExecutorInput<Partial<Quad>>;
   let executor: IndexFilterExecutor;
 
   beforeEach(async(): Promise<void> => {
@@ -54,8 +55,8 @@ describe('IndexFilterExecutor', (): void => {
         metadata: new RepresentationMetadata(),
       },
       filter: {
-        data: JSON.stringify(filter),
-        metadata: new RepresentationMetadata({ [CONTENT_TYPE]: 'application/json' }),
+        data: filter,
+        metadata: new RepresentationMetadata({ [RDF.type]: DERIVED_TYPES.terms.QuadPattern }),
       },
       representations: [
         new BasicRepresentation([], id1),
@@ -76,32 +77,22 @@ describe('IndexFilterExecutor', (): void => {
     executor = new IndexFilterExecutor(resourceIndexParser);
   });
 
-  it('requires JSON.', async(): Promise<void> => {
-    input.filter.metadata.contentType = 'text/plain';
-    await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
-  });
-
-  it('requires the filter to be a string.', async(): Promise<void> => {
-    input.filter.data = 5;
-    await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
-  });
-
   it('rejects non-quad filters.', async(): Promise<void> => {
-    input.filter.data = '{ "wrong": "field" }';
+    input.filter.metadata.set(RDF.terms.type, DERIVED_TYPES.terms.String);
     await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
   });
 
   it('rejects quads that do not have exactly 1 variable.', async(): Promise<void> => {
-    input.filter.data = JSON.stringify({
+    input.filter.data = {
       predicate: {
         termType: 'Variable',
-        values: 'v1',
+        value: 'v1',
       },
       object: {
         termType: 'Variable',
-        values: 'v2',
+        value: 'v2',
       },
-    });
+    } as Partial<Quad>;
     await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
   });
 

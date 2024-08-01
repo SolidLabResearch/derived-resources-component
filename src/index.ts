@@ -15,7 +15,9 @@ export * from './filter/parser/FilterParser';
 export * from './filter/parser/InputFilterParser';
 export * from './filter/parser/MappingFilterParser';
 export * from './filter/parser/QuadFilterParser';
+export * from './filter/parser/QuadPatternFilterParser';
 export * from './filter/parser/ResourceFilterParser';
+export * from './filter/parser/ShaclFilterParser';
 
 export * from './filter/BaseFilterHandler';
 export * from './filter/CachedFilterExecutor';

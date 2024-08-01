@@ -22,7 +22,8 @@
         "source": {
           "@type": "WaterfallHandler",
           "handlers": [
-            { "@type": "QuadFilterParser" },
+            { "@type": "QuadPatternFilterParser" },
+            { "@type": "ShaclFilterParser" },
             { "@type": "InputFilterParser" }
           ]
         }

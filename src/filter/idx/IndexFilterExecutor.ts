@@ -1,19 +1,18 @@
 import type { Readable } from 'node:stream';
 import { PassThrough } from 'node:stream';
 import type { BlankNode, Quad, Quad_Object, Term } from '@rdfjs/types';
-import type {
-  Representation,
-} from '@solid/community-server';
+import type { Representation } from '@solid/community-server';
 import {
   BasicRepresentation,
   INTERNAL_QUADS,
   NotImplementedHttpError,
   PREFERRED_PREFIX_TERM,
+  RDF,
   SOLID_META,
   transformSafely,
 } from '@solid/community-server';
 import { DataFactory, Store } from 'n3';
-import { DERIVED_INDEX } from '../../Vocabularies';
+import { DERIVED_INDEX, DERIVED_TYPES } from '../../Vocabularies';
 import type { FilterExecutorInput } from '../FilterExecutor';
 import { FilterExecutor } from '../FilterExecutor';
 import type { QuadPatternExecutor } from './QuadPatternExecutor';
@@ -36,23 +35,16 @@ export class IndexFilterExecutor extends FilterExecutor {
     this.resourceIndexParser = resourceIndexParser;
   }
 
-  public async canHandle({ filter, representations }: FilterExecutorInput): Promise<void> {
-    if (filter.metadata.contentType !== 'application/json') {
-      throw new NotImplementedHttpError('Only application/json filters are supported.');
-    }
-
-    if (typeof filter.data !== 'string') {
-      throw new NotImplementedHttpError('Expected filter data to be a string.');
-    }
-
-    const json = JSON.parse(filter.data) as Record<string, unknown>;
-    if (!Object.keys(json).every((key): boolean => (EXPECTED_KEYS as readonly string[]).includes(key))) {
-      throw new NotImplementedHttpError('Expected a json object with keys subject, predicate, object and/or graph.');
+  public async canHandle({ filter, representations }: FilterExecutorInput<Partial<Quad>>): Promise<void> {
+    console.log(filter);
+    const typed = filter.metadata.getAll(RDF.terms.type);
+    if (!typed.some((term): boolean => term.equals(DERIVED_TYPES.terms.QuadPattern))) {
+      throw new NotImplementedHttpError('Only supports Quad pattern filters');
     }
 
     let varCount = 0;
-    for (const key of Object.keys(json)) {
-      if ((json[key] as Term).termType === 'Variable') {
+    for (const key of Object.keys(filter.data) as (keyof Quad)[]) {
+      if ((filter.data[key] as Term).termType === 'Variable') {
         varCount += 1;
       }
     }
@@ -62,17 +54,15 @@ export class IndexFilterExecutor extends FilterExecutor {
     }
 
     for (const representation of representations) {
-      await this.resourceIndexParser.canHandle({ filter: json, representation });
+      await this.resourceIndexParser.canHandle({ filter: filter.data, representation });
     }
   }
 
-  public async handle(input: FilterExecutorInput): Promise<Representation> {
-    const filter = JSON.parse(input.filter.data as string) as Partial<Quad>;
-
+  public async handle(input: FilterExecutorInput<Partial<Quad>>): Promise<Representation> {
     // Find the variable
     let position: typeof EXPECTED_KEYS[number];
     for (const key of EXPECTED_KEYS) {
-      if ((filter[key] as Term | undefined)?.termType === 'Variable') {
+      if ((input.filter.data[key] as Term | undefined)?.termType === 'Variable') {
         position = key;
       }
     }
@@ -84,7 +74,7 @@ export class IndexFilterExecutor extends FilterExecutor {
 
     const streams = await Promise.all(input.representations.map(async(representation): Promise<Readable> => {
       const createQuads = this.createQuadFn(position, store, matches, representation.metadata.identifier);
-      const data = await this.resourceIndexParser.handle({ representation, filter });
+      const data = await this.resourceIndexParser.handle({ representation, filter: input.filter.data });
       return this.createTransform(data, createQuads);
     }));
     const merged = this.mergeStreams(streams);

@@ -10,7 +10,7 @@ import {
 } from '@solid/community-server';
 import type { Store } from 'n3';
 import SHACLValidator from 'rdf-validate-shacl';
-import { SH } from '../Vocabularies';
+import { DERIVED_TYPES, SH } from '../Vocabularies';
 import type { N3FilterExecutorInput } from './N3FilterExecutor';
 import { N3FilterExecutor } from './N3FilterExecutor';
 
@@ -20,11 +20,9 @@ export class ShaclFilterExecutor extends N3FilterExecutor<Store> {
   protected readonly logger = getLoggerFor(this);
 
   public async canHandle(input: N3FilterExecutorInput<Store>): Promise<void> {
-    if (typeof input.filter.data !== 'object' || !('countQuads' in input.filter.data)) {
-      throw new NotImplementedHttpError('Expected an N3.js Store as filter');
-    }
-    if (input.filter.data.countQuads(null, SH.terms.property, null, null) === 0) {
-      throw new NotImplementedHttpError('Expected at least one sh:property predicate in a SHACL resource');
+    const typed = input.filter.metadata.getAll(RDF.terms.type);
+    if (!typed.some((term): boolean => term.equals(DERIVED_TYPES.terms.Shacl))) {
+      throw new NotImplementedHttpError('Only supports SHACL filters');
     }
   }
 

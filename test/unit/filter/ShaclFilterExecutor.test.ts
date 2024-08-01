@@ -1,11 +1,13 @@
 import {
   INTERNAL_QUADS,
+  RDF,
   readableToQuads,
   RepresentationMetadata,
 } from '@solid/community-server';
 import { Parser, Store } from 'n3';
 import type { N3FilterExecutorInput } from '../../../src/filter/N3FilterExecutor';
 import { ShaclFilterExecutor } from '../../../src/filter/ShaclFilterExecutor';
+import { DERIVED_TYPES } from '../../../src/Vocabularies';
 
 describe('ShaclFilterExecutor', (): void => {
   const turtle = `
@@ -72,21 +74,16 @@ describe('ShaclFilterExecutor', (): void => {
       },
       filter: {
         data: new Store(new Parser().parse(shacl)),
-        metadata: new RepresentationMetadata(),
+        metadata: new RepresentationMetadata({ [RDF.type]: DERIVED_TYPES.terms.Shacl }),
       },
       data: new Store(new Parser().parse(turtle)),
     };
   });
 
-  it('can only handle N3.js Store filters.', async(): Promise<void> => {
-    input.filter.data = 'not a store' as any;
-    await expect(parser.canHandle(input)).rejects.toThrow('Expected an N3.js Store as filter');
-  });
-
   it('can only handle Shacl filters.', async(): Promise<void> => {
-    input.filter.data = new Store();
+    input.filter.metadata.set(RDF.terms.type, DERIVED_TYPES.terms.String);
     await expect(parser.canHandle(input))
-      .rejects.toThrow('Expected at least one sh:property predicate in a SHACL resource');
+      .rejects.toThrow('Only supports SHACL filters');
   });
 
   it('extracts triples matching the shape.', async(): Promise<void> => {
