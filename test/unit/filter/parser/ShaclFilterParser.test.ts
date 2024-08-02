@@ -1,4 +1,4 @@
-import { InternalServerError, RDF, RepresentationMetadata } from '@solid/community-server';
+import { InternalServerError, RepresentationMetadata } from '@solid/community-server';
 import type { DerivationConfig } from '../../../../src/DerivationConfig';
 import { ShaclFilterParser } from '../../../../src/filter/parser/ShaclFilterParser';
 import { DERIVED_TYPES, SH } from '../../../../src/Vocabularies';
@@ -50,7 +50,7 @@ describe('ShaclFilterParser', (): void => {
     await expect(parser.canHandle(config)).resolves.toBeUndefined();
     const result = await parser.handle(config);
     expect(result.data.countQuads(null, SH.terms.property, null, null)).toBe(1);
-    expect(result.metadata.quads(null, RDF.terms.type, DERIVED_TYPES.terms.Shacl)).toHaveLength(1);
-    expect(result.metadata.quads(null, RDF.terms.type, DERIVED_TYPES.terms.Store)).toHaveLength(1);
+    expect(result.type.equals(DERIVED_TYPES.terms.Shacl)).toBe(true);
+    expect(result.checksum).toBe(config.filter);
   });
 });

@@ -6,7 +6,6 @@ import {
   guardedStreamFrom,
   INTERNAL_QUADS,
   NotImplementedHttpError,
-  RDF,
   readableToQuads,
   RepresentationMetadata,
 } from '@solid/community-server';
@@ -56,7 +55,8 @@ describe('IndexFilterExecutor', (): void => {
       },
       filter: {
         data: filter,
-        metadata: new RepresentationMetadata({ [RDF.type]: DERIVED_TYPES.terms.QuadPattern }),
+        type: DERIVED_TYPES.terms.QuadPattern,
+        metadata: new RepresentationMetadata(),
       },
       representations: [
         new BasicRepresentation([], id1),
@@ -78,7 +78,7 @@ describe('IndexFilterExecutor', (): void => {
   });
 
   it('rejects non-quad filters.', async(): Promise<void> => {
-    input.filter.metadata.set(RDF.terms.type, DERIVED_TYPES.terms.String);
+    input.filter.type = DERIVED_TYPES.terms.String;
     await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
   });
 

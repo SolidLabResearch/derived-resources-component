@@ -3,10 +3,12 @@ import type { DerivationConfig } from '../../../../src/DerivationConfig';
 import type { Filter } from '../../../../src/filter/Filter';
 import type { FilterParser } from '../../../../src/filter/parser/FilterParser';
 import { MappingFilterParser } from '../../../../src/filter/parser/MappingFilterParser';
+import { DERIVED_TYPES } from '../../../../src/Vocabularies';
 
 describe('MappingFilterParser', (): void => {
   const filter: Filter<string> = {
     data: 'filter',
+    type: DERIVED_TYPES.terms.String,
     metadata: new RepresentationMetadata(),
   };
   let config: DerivationConfig;

@@ -1,4 +1,4 @@
-import { InternalServerError, NotImplementedHttpError, RDF, RepresentationMetadata } from '@solid/community-server';
+import { InternalServerError, NotImplementedHttpError, RepresentationMetadata } from '@solid/community-server';
 import type { DerivationConfig } from '../../../../src/DerivationConfig';
 import { QuadPatternFilterParser } from '../../../../src/filter/parser/QuadPatternFilterParser';
 import { DERIVED_TYPES } from '../../../../src/Vocabularies';
@@ -45,8 +45,11 @@ describe('QuadPatternFilterParser', (): void => {
 
   it('returns a quad pattern filter.', async(): Promise<void> => {
     await expect(parser.canHandle(config)).resolves.toBeUndefined();
-    const result = await parser.handle(config);
-    expect(result.data).toEqual(filter);
-    expect(result.metadata.get(RDF.terms.type)?.value).toEqual(DERIVED_TYPES.QuadPattern);
+    await expect(parser.handle(config)).resolves.toEqual({
+      data: filter,
+      checksum: config.filter,
+      type: DERIVED_TYPES.terms.QuadPattern,
+      metadata: new RepresentationMetadata(),
+    });
   });
 });

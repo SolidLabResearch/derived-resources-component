@@ -90,7 +90,7 @@ export class CachedFilterExecutor extends FilterExecutor {
    * ensuring this value changes if anything impacting the derived resource changes.
    */
   protected getChecksum(input: FilterExecutorInput): string | undefined {
-    if (typeof input.filter.data !== 'string') {
+    if (!input.filter.checksum) {
       return;
     }
 
@@ -101,6 +101,6 @@ export class CachedFilterExecutor extends FilterExecutor {
     });
     resourceKeys.sort();
 
-    return createHash('md5').update(`${input.filter.data} ${resourceKeys.join(' ')}`).digest('hex');
+    return createHash('md5').update(`${input.filter.checksum} ${resourceKeys.join(' ')}`).digest('hex');
   }
 }
