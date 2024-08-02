@@ -14,6 +14,7 @@ import {
   NotImplementedHttpError,
 } from '@solid/community-server';
 import type * as asyncIt from 'asynciterator';
+import { DERIVED_TYPES } from '../Vocabularies';
 import type { N3FilterExecutorInput } from './N3FilterExecutor';
 import { N3FilterExecutor } from './N3FilterExecutor';
 
@@ -30,8 +31,8 @@ export class SparqlFilterExecutor extends N3FilterExecutor<string> {
   }
 
   public async canHandle({ filter }: N3FilterExecutorInput): Promise<void> {
-    if (filter.metadata.contentType !== 'application/sparql-query') {
-      throw new NotImplementedHttpError('Only application/sparql-query filters are supported.');
+    if (!filter.type.equals(DERIVED_TYPES.terms.Sparql)) {
+      throw new NotImplementedHttpError('Only SPARQL filters are supported.');
     }
   }
 

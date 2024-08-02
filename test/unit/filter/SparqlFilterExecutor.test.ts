@@ -35,8 +35,8 @@ describe('SparqlFilterExecutor', (): void => {
           WHERE {
             ?s foaf:name ?o.
           }`,
-        type: DERIVED_TYPES.terms.String,
-        metadata: new RepresentationMetadata('application/sparql-query'),
+        type: DERIVED_TYPES.terms.Sparql,
+        metadata: new RepresentationMetadata(),
       },
     };
   });
@@ -44,7 +44,7 @@ describe('SparqlFilterExecutor', (): void => {
   it('can only handle SPARQL query filters.', async(): Promise<void> => {
     await expect(executor.canHandle(input)).resolves.toBeUndefined();
 
-    input.filter.metadata.contentType = 'text/plain';
+    input.filter.type = DERIVED_TYPES.terms.String;
     await expect(executor.canHandle(input)).rejects.toThrow(NotImplementedHttpError);
   });
 

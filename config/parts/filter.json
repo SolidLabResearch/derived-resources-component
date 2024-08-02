@@ -24,6 +24,7 @@
           "handlers": [
             { "@type": "QuadPatternFilterParser" },
             { "@type": "ShaclFilterParser" },
+            { "@type": "SparqlFilterParser" },
             { "@type": "InputFilterParser" }
           ]
         }

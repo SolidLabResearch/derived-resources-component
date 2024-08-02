@@ -18,6 +18,7 @@ export * from './filter/parser/QuadFilterParser';
 export * from './filter/parser/QuadPatternFilterParser';
 export * from './filter/parser/ResourceFilterParser';
 export * from './filter/parser/ShaclFilterParser';
+export * from './filter/parser/SparqlFilterParser';
 
 export * from './filter/BaseFilterHandler';
 export * from './filter/CachedFilterExecutor';
