@@ -1,11 +1,13 @@
 import type { Quad } from '@rdfjs/types';
-import { InternalServerError, NotImplementedHttpError, RDF, RepresentationMetadata } from '@solid/community-server';
+import { InternalServerError, NotImplementedHttpError, RepresentationMetadata } from '@solid/community-server';
 import type { DerivationConfig } from '../../DerivationConfig';
 import { DERIVED_TYPES } from '../../Vocabularies';
 import type { Filter } from '../Filter';
 import { FilterParser } from './FilterParser';
 
-// TODO:
+/**
+ * Converts a partial representation of JSON quad into an actual Partial<Quad>.
+ */
 export class QuadPatternFilterParser extends FilterParser {
   protected readonly cache: WeakMap<DerivationConfig, Partial<Quad>> = new WeakMap();
 
@@ -30,7 +32,9 @@ export class QuadPatternFilterParser extends FilterParser {
     }
     return {
       data: cached,
-      metadata: new RepresentationMetadata({ [RDF.type]: DERIVED_TYPES.terms.QuadPattern }),
+      type: DERIVED_TYPES.terms.QuadPattern,
+      checksum: input.filter,
+      metadata: new RepresentationMetadata(),
     };
   }
 }

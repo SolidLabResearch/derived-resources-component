@@ -9,6 +9,7 @@ import {
 } from '@solid/community-server';
 import { CachedFilterExecutor } from '../../../src/filter/CachedFilterExecutor';
 import type { FilterExecutor, FilterExecutorInput } from '../../../src/filter/FilterExecutor';
+import { DERIVED_TYPES } from '../../../src/Vocabularies';
 
 async function flushPromises(): Promise<void> {
   // This flushes the promises, causing the cache to be filled
@@ -25,6 +26,8 @@ describe('A CachedFilterExecutor', (): void => {
     input = {
       filter: {
         data: 'filter data',
+        checksum: 'checksum',
+        type: DERIVED_TYPES.terms.String,
         metadata: new RepresentationMetadata(),
       },
       config: {
@@ -83,6 +86,19 @@ describe('A CachedFilterExecutor', (): void => {
     await flushPromises();
 
     input.representations[0].metadata.set(DC.terms.modified, new Date().toISOString());
+
+    const result = await executor.handle(input);
+    await expect(readableToString(result.data)).resolves.toBe('test');
+    expect(result.metadata.contentType).toBe('text/plain');
+    expect(source.handle).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not use the cached result if there is no checksum.', async(): Promise<void> => {
+    delete input.filter.checksum;
+    await executor.handle(input);
+    expect(source.handle).toHaveBeenCalledTimes(1);
+
+    await flushPromises();
 
     const result = await executor.handle(input);
     await expect(readableToString(result.data)).resolves.toBe('test');

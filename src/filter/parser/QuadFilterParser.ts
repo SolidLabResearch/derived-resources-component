@@ -3,7 +3,6 @@ import {
   getLoggerFor,
   InternalServerError,
   NotImplementedHttpError,
-  RDF,
   RepresentationMetadata,
 } from '@solid/community-server';
 import { Parser, Store } from 'n3';
@@ -40,7 +39,9 @@ export class QuadFilterParser extends FilterParser<Store> {
     }
     return {
       data: store,
-      metadata: new RepresentationMetadata({ [RDF.type]: DERIVED_TYPES.terms.Store }),
+      type: DERIVED_TYPES.terms.Store,
+      checksum: input.filter,
+      metadata: new RepresentationMetadata(),
     };
   }
 }

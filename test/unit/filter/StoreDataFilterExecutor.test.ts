@@ -8,6 +8,7 @@ import { DataFactory, Store } from 'n3';
 import type { FilterExecutorInput } from '../../../src/filter/FilterExecutor';
 import type { N3FilterExecutor } from '../../../src/filter/N3FilterExecutor';
 import { StoreDataFilterExecutor } from '../../../src/filter/StoreDataFilterExecutor';
+import { DERIVED_TYPES } from '../../../src/Vocabularies';
 
 describe('StoreDataFilterExecutor', (): void => {
   const representation = 'representation';
@@ -29,6 +30,7 @@ describe('StoreDataFilterExecutor', (): void => {
     input = {
       filter: {
         data: 'data',
+        type: DERIVED_TYPES.terms.String,
         metadata: new RepresentationMetadata(),
       },
       config: {

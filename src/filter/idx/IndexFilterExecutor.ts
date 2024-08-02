@@ -7,7 +7,6 @@ import {
   INTERNAL_QUADS,
   NotImplementedHttpError,
   PREFERRED_PREFIX_TERM,
-  RDF,
   SOLID_META,
   transformSafely,
 } from '@solid/community-server';
@@ -36,9 +35,7 @@ export class IndexFilterExecutor extends FilterExecutor {
   }
 
   public async canHandle({ filter, representations }: FilterExecutorInput<Partial<Quad>>): Promise<void> {
-    console.log(filter);
-    const typed = filter.metadata.getAll(RDF.terms.type);
-    if (!typed.some((term): boolean => term.equals(DERIVED_TYPES.terms.QuadPattern))) {
+    if (!filter.type.equals(DERIVED_TYPES.terms.QuadPattern)) {
       throw new NotImplementedHttpError('Only supports Quad pattern filters');
     }
 

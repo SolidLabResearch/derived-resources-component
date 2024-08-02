@@ -7,6 +7,7 @@ import {
 import { DataFactory, Store } from 'n3';
 import type { N3FilterExecutorInput } from '../../../src/filter/N3FilterExecutor';
 import { SparqlFilterExecutor } from '../../../src/filter/SparqlFilterExecutor';
+import { DERIVED_TYPES } from '../../../src/Vocabularies';
 import literal = DataFactory.literal;
 import namedNode = DataFactory.namedNode;
 
@@ -34,6 +35,7 @@ describe('SparqlFilterExecutor', (): void => {
           WHERE {
             ?s foaf:name ?o.
           }`,
+        type: DERIVED_TYPES.terms.String,
         metadata: new RepresentationMetadata('application/sparql-query'),
       },
     };

@@ -1,6 +1,5 @@
 import {
   INTERNAL_QUADS,
-  RDF,
   readableToQuads,
   RepresentationMetadata,
 } from '@solid/community-server';
@@ -74,14 +73,15 @@ describe('ShaclFilterExecutor', (): void => {
       },
       filter: {
         data: new Store(new Parser().parse(shacl)),
-        metadata: new RepresentationMetadata({ [RDF.type]: DERIVED_TYPES.terms.Shacl }),
+        type: DERIVED_TYPES.terms.Shacl,
+        metadata: new RepresentationMetadata(),
       },
       data: new Store(new Parser().parse(turtle)),
     };
   });
 
   it('can only handle Shacl filters.', async(): Promise<void> => {
-    input.filter.metadata.set(RDF.terms.type, DERIVED_TYPES.terms.String);
+    input.filter.type = DERIVED_TYPES.terms.String;
     await expect(parser.canHandle(input))
       .rejects.toThrow('Only supports SHACL filters');
   });

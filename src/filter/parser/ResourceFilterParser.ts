@@ -58,7 +58,7 @@ export class ResourceFilterParser<T = unknown> extends FilterParser<T> {
     representation.metadata.setMetadata(filter.metadata);
 
     return {
-      data: filter.data,
+      ...filter,
       metadata: representation.metadata,
     };
   }

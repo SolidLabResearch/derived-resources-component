@@ -13,7 +13,6 @@ interface CachedQuads {
   checksum: string;
 }
 
-// TODO: check how much is duplicate after adding relevant functions to Filter objects
 function sizeCalculation({ quads }: CachedQuads): number {
   let size = 1;
   for (const quad of quads) {

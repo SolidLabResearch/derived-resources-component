@@ -20,8 +20,7 @@ export class ShaclFilterExecutor extends N3FilterExecutor<Store> {
   protected readonly logger = getLoggerFor(this);
 
   public async canHandle(input: N3FilterExecutorInput<Store>): Promise<void> {
-    const typed = input.filter.metadata.getAll(RDF.terms.type);
-    if (!typed.some((term): boolean => term.equals(DERIVED_TYPES.terms.Shacl))) {
+    if (!input.filter.type.equals(DERIVED_TYPES.terms.Shacl)) {
       throw new NotImplementedHttpError('Only supports SHACL filters');
     }
   }

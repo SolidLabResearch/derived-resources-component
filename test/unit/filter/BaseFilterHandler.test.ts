@@ -5,7 +5,7 @@ import type { Filter } from '../../../src/filter/Filter';
 import type { FilterExecutor } from '../../../src/filter/FilterExecutor';
 import type { FilterHandlerInput } from '../../../src/filter/FilterHandler';
 import type { FilterParser } from '../../../src/filter/parser/FilterParser';
-import { DERIVED } from '../../../src/Vocabularies';
+import { DERIVED, DERIVED_TYPES } from '../../../src/Vocabularies';
 
 describe('BaseFilterHandler', (): void => {
   let parser: jest.Mocked<FilterParser>;
@@ -16,6 +16,7 @@ describe('BaseFilterHandler', (): void => {
   const date2 = new Date(2020, 1, 14);
   const filter: Filter = {
     data: 'data',
+    type: DERIVED_TYPES.terms.String,
     metadata: new RepresentationMetadata(),
   };
   let input: FilterHandlerInput;
