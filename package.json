@@ -33,11 +33,13 @@
     "@comunica/query-sparql": "^2.10.2",
     "@rdfjs/types": "^1.1.0",
     "@solid/community-server": "^7.1.0",
+    "@types/sparqljs": "^3.1.11",
     "asynciterator": "^3.9.0",
     "lru-cache": "^10.4.3",
     "n3": "^1.17.4",
     "rdf-string": "^1.6.3",
     "rdf-validate-shacl": "^0.4.5",
+    "sparqljs": "^3.7.1",
     "uri-template-lite": "^23.4.0"
   },
   "devDependencies": {

@@ -16,6 +16,7 @@ export const DERIVED = createVocabulary(
 export const DERIVED_TYPES = createVocabulary(
   'urn:npm:solid:derived-resources:types:',
   'Shacl',
+  'Sparql',
   'Store',
   'String',
   'QuadPattern',
