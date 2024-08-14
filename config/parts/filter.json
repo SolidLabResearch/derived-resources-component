@@ -22,6 +22,7 @@
         "source": {
           "@type": "WaterfallHandler",
           "handlers": [
+            { "@type": "QpfFilterParser" },
             { "@type": "QuadPatternFilterParser" },
             { "@type": "ShaclFilterParser" },
             { "@type": "SparqlFilterParser" },
@@ -39,13 +40,14 @@
         "@type": "WaterfallHandler",
         "handlers": [
           {
+            "@id": "urn:solid-server:default:QpfFilterExecutor",
+            "@type": "QpfFilterExecutor",
+            "quadFilterParser": { "@id": "urn:solid-server:default:CachedQuadIndexExecutor" }
+          },
+          {
             "@id": "urn:solid-server:default:IndexFilterExecutor",
             "@type": "IndexFilterExecutor",
-            "resourceIndexParser": {
-              "@id": "urn:solid-server:default:CachedResourceIndexParser",
-              "@type": "CachedQuadPatternExecutor",
-              "source": { "@type": "BaseQuadPatternExecutor" }
-            }
+            "quadPatternExecutor": { "@id": "urn:solid-server:default:CachedQuadIndexExecutor" }
           },
           {
             "@id": "urn:solid-server:default:StoreDataFilterExecutor",
@@ -60,6 +62,11 @@
           }
         ]
       }
+    },
+    {
+      "@id": "urn:solid-server:default:CachedQuadIndexExecutor",
+      "@type": "CachedQuadPatternExecutor",
+      "source": { "@type": "BaseQuadPatternExecutor" }
     }
   ]
 }

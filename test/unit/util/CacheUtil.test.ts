@@ -43,13 +43,20 @@ describe('CacheUtil', (): void => {
     it('caches a representation and returns a copy that can still be used.', async(): Promise<void> => {
       const representation = new BasicRepresentation('pear', 'text/plain');
       const cached = await representationToCached(representation);
+      expect(cached).toBeDefined();
 
-      expect(cached.data).toEqual([ 'pear' ]);
-      expect(cached.metadata.contentType).toBe('text/plain');
+      expect(cached!.data).toEqual([ 'pear' ]);
+      expect(cached!.metadata.contentType).toBe('text/plain');
 
       // Changing content type to make sure original version doesn't change
-      cached.metadata.contentType = 'text/turtle';
+      cached!.metadata.contentType = 'text/turtle';
       expect(representation.metadata.contentType).toBe('text/plain');
+    });
+
+    it('returns undefined if there was an error when reading the stream.', async(): Promise<void> => {
+      const representation = new BasicRepresentation('pear', 'text/plain');
+      representation.data.destroy(new Error('bad data'));
+      await expect(representationToCached(representation)).resolves.toBeUndefined();
     });
   });
 

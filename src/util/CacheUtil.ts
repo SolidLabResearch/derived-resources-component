@@ -5,11 +5,15 @@ import type {
 } from '@solid/community-server';
 import {
   BasicRepresentation,
+  createErrorMessage,
+  getLoggerFor,
   guardedStreamFrom,
   InternalServerError,
   pipeSafely,
   RepresentationMetadata,
 } from '@solid/community-server';
+
+const logger = getLoggerFor('CacheUtil');
 
 /**
  * The cached version of a representation.
@@ -81,12 +85,23 @@ export function cachedToRepresentation(cached: CachedRepresentation): Representa
  * The generated value is not linked to the {@link Representation},
  * so any changes to it will not impact the original.
  *
+ * Returns undefined if there was an error, implying the data was not fully read.
+ *
  * @param representation - Representation to convert.
  */
-export async function representationToCached(representation: Representation): Promise<CachedRepresentation> {
-  const data = await readStream(representation.data);
-  const metadata = new RepresentationMetadata(representation.metadata);
-  return { data, metadata };
+export async function representationToCached(representation: Representation):
+Promise<CachedRepresentation | undefined> {
+  try {
+    const data = await readStream(representation.data);
+    const metadata = new RepresentationMetadata(representation.metadata);
+    return { data, metadata };
+  } catch (error: unknown) {
+    // This just means the request was not interested in the data and closed the stream
+    if ((error as Error).message !== 'Premature close') {
+      logger.error(`Unable to cache representation for ${
+        representation.metadata.identifier.value}: ${createErrorMessage(error)}`);
+    }
+  }
 }
 
 /**

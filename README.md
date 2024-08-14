@@ -80,7 +80,9 @@ all resources found in the `http://localhost:3000/` container are used.
 
 ### Filter
 
-This is the identifier of a resource that contains a valid SPARQL query.
+This is the identifier of a resource that contains a valid filter.
+One type of filter is a SPARQL query,
+for all types, see [here](documentation/filters.md).
 
 In case the template contains a URL template, the resulting variable(s) can be used here.
 This is done with a simple string replacement on the query.
@@ -114,7 +116,7 @@ The query can be seen at <http://localhost:3000/filters/container>.
 ## Derived index resources
 
 A new feature that was added at a later point was support for derived index resources.
-More info on these and the relevant examples can be found [here](derived-index.md).
+More info on these and the relevant examples can be found [here](documentation/derived-index.md).
 
 ## Caching
 
@@ -147,7 +149,7 @@ so it stays in the cache until it gets dropped because the cache is full.
   Note that this allows users to access data they do not have access to if they guess the URL of such data.
   We might want to implement it so creating a derived resource requires read access on all selectors,
   similar to notifications.
-  This can be enabled as seen [here](derived-index.md).
+  This can be enabled as seen [here](documentation/derived-index.md).
 - An extra conversion store is added to the config as the new `ResourceStore` needs to do content negotiation
   on data it receives from the backend,
   but also wants to allow content negotiation on the data stream it generates.

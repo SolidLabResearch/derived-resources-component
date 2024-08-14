@@ -22,3 +22,11 @@
         derived:selector <.meta>;
         derived:filter <../filters/container>
     ].
+
+<>
+    derived:derivedResource [
+        derived:template "qpf{?s,p,o,g}";
+        derived:selector <../data/auth/**>;
+        derived:filter <../filters/qpf>;
+        derived:feature derived:ReadableSources
+    ].
