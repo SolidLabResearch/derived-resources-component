@@ -1,4 +1,4 @@
-import { createVocabulary } from '@solid/community-server';
+import { createVocabulary, extendVocabulary, FOAF as FOAF_CSS, RDF as RDF_CSS } from '@solid/community-server';
 
 export const DERIVED = createVocabulary(
   'urn:npm:solid:derived-resources:',
@@ -15,17 +15,35 @@ export const DERIVED = createVocabulary(
 
 export const DERIVED_TYPES = createVocabulary(
   'urn:npm:solid:derived-resources:types:',
+  'QPF',
+  'QuadPattern',
   'Shacl',
   'Sparql',
   'Store',
   'String',
-  'QuadPattern',
 );
 
 export const DERIVED_INDEX = createVocabulary(
   'urn:npm:solid:derived-index:',
   'for',
   'instance',
+);
+
+export const HYDRA = createVocabulary(
+  'http://www.w3.org/ns/hydra/core#',
+  'first',
+  'mapping',
+  'property',
+  'search',
+  'template',
+  'totalItems',
+  'variable',
+);
+
+export const SD = createVocabulary(
+  'http://www.w3.org/ns/sparql-service-description#',
+  'defaultGraph',
+  'graph',
 );
 
 export const SH = createVocabulary(
@@ -42,4 +60,22 @@ export const SH = createVocabulary(
   'targetClass',
   'targetSubjectsOf',
   'targetObjectsOf',
+);
+
+export const VOID = createVocabulary(
+  'http://rdfs.org/ns/void#',
+  'triples',
+  'subset',
+);
+
+export const FOAF = extendVocabulary(
+  FOAF_CSS,
+  'primaryTopic',
+);
+
+export const RDF = extendVocabulary(
+  RDF_CSS,
+  'subject',
+  'predicate',
+  'object',
 );

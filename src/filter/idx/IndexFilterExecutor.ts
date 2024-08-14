@@ -1,5 +1,4 @@
 import type { Readable } from 'node:stream';
-import { PassThrough } from 'node:stream';
 import type { BlankNode, Quad, Quad_Object, Term } from '@rdfjs/types';
 import type { Representation } from '@solid/community-server';
 import {
@@ -11,6 +10,7 @@ import {
   transformSafely,
 } from '@solid/community-server';
 import { DataFactory, Store } from 'n3';
+import { mergeStreams } from '../../util/StreamUtil';
 import { DERIVED_INDEX, DERIVED_TYPES } from '../../Vocabularies';
 import type { FilterExecutorInput } from '../FilterExecutor';
 import { FilterExecutor } from '../FilterExecutor';
@@ -27,11 +27,11 @@ const EXPECTED_KEYS = [ 'subject', 'predicate', 'object', 'graph' ] as const;
  * and which value was in the variable position.
  */
 export class IndexFilterExecutor extends FilterExecutor {
-  protected readonly resourceIndexParser: QuadPatternExecutor;
+  protected readonly quadPatternExecutor: QuadPatternExecutor;
 
-  public constructor(resourceIndexParser: QuadPatternExecutor) {
+  public constructor(quadPatternExecutor: QuadPatternExecutor) {
     super();
-    this.resourceIndexParser = resourceIndexParser;
+    this.quadPatternExecutor = quadPatternExecutor;
   }
 
   public async canHandle({ filter, representations }: FilterExecutorInput<Partial<Quad>>): Promise<void> {
@@ -51,7 +51,7 @@ export class IndexFilterExecutor extends FilterExecutor {
     }
 
     for (const representation of representations) {
-      await this.resourceIndexParser.canHandle({ filter: filter.data, representation });
+      await this.quadPatternExecutor.canHandle({ filter: filter.data, representation });
     }
   }
 
@@ -71,10 +71,10 @@ export class IndexFilterExecutor extends FilterExecutor {
 
     const streams = await Promise.all(input.representations.map(async(representation): Promise<Readable> => {
       const createQuads = this.createQuadFn(position, store, matches, representation.metadata.identifier);
-      const data = await this.resourceIndexParser.handle({ representation, filter: input.filter.data });
+      const data = await this.quadPatternExecutor.handle({ representation, filter: input.filter.data });
       return this.createTransform(data, createQuads);
     }));
-    const merged = this.mergeStreams(streams);
+    const merged = mergeStreams(streams);
 
     const representation = new BasicRepresentation(merged, input.config.identifier, INTERNAL_QUADS);
     representation.metadata.addQuad(
@@ -121,23 +121,5 @@ export class IndexFilterExecutor extends FilterExecutor {
       objectMode: true,
     });
     return transformed;
-  }
-
-  protected mergeStreams(streams: Readable[]): Readable {
-    let count = streams.length;
-    const merged = new PassThrough({ objectMode: true });
-    for (const stream of streams) {
-      stream.pipe(merged, { end: false });
-      stream.on('error', (error): void => {
-        merged.destroy(error);
-      });
-      stream.on('end', (): void => {
-        count -= 1;
-        if (count === 0) {
-          merged.end();
-        }
-      });
-    }
-    return merged;
   }
 }

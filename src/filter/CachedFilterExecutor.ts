@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import type { Representation } from '@solid/community-server';
-import { createErrorMessage, DC, getLoggerFor } from '@solid/community-server';
+import { DC, getLoggerFor } from '@solid/community-server';
 import { LRUCache } from 'lru-cache';
 import type {
   CachedRepresentation,
@@ -74,14 +74,11 @@ export class CachedFilterExecutor extends FilterExecutor {
   protected cacheRepresentation(key: string, checksum: string, representation: Representation): Representation {
     const [ copy1, copy2 ] = duplicateRepresentation(representation);
     // Don't await so the result can immediately be returned while caching
-    representationToCached(copy1)
-      .then((newCached): unknown => this.cache.set(key, { ...newCached, checksum }))
-      .catch((err): void => {
-        // This just means the request was not interested in the data and closed the stream
-        if ((err as Error).message !== 'Premature close') {
-          this.logger.error(`Unable to cache derived representation for ${key}: ${createErrorMessage(err)}`);
-        }
-      });
+    representationToCached(copy1).then((newCached): void => {
+      if (newCached) {
+        this.cache.set(key, { ...newCached, checksum });
+      }
+    }).catch((): void => {});
     return copy2;
   }
 

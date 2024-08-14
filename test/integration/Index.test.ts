@@ -1,5 +1,6 @@
+import { QueryEngine } from '@comunica/query-sparql';
 import type { App } from '@solid/community-server';
-import { AppRunner, joinFilePath, joinUrl } from '@solid/community-server';
+import { AppRunner, joinFilePath, joinUrl, LDP, RDF } from '@solid/community-server';
 import { DataFactory, Parser, Store } from 'n3';
 import { DERIVED_INDEX } from '../../src/Vocabularies';
 import namedNode = DataFactory.namedNode;
@@ -73,5 +74,26 @@ describe('The server auth test setup', (): void => {
       namedNode(joinUrl(baseUrl, 'data/auth/alice')),
       null,
     )).toBe(1);
+  });
+
+  it('can query the QPF resource using Comunica.', async(): Promise<void> => {
+    const query = `
+      CONSTRUCT { ?s a ?o }
+      WHERE {
+        ?s a ?o
+      }
+    `;
+    const engine = new QueryEngine();
+    const result = await engine.queryQuads(query, { sources: [ joinUrl(baseUrl, 'index/qpf') ]});
+    const store = new Store();
+    for await (const quad of result) {
+      store.add(quad);
+    }
+    expect(store.size).toBe(5);
+    expect(store.countQuads('http://localhost:3457/data/auth/', RDF.terms.type, LDP.terms.Resource, null)).toBe(1);
+    expect(store.countQuads('http://localhost:3457/data/auth/', RDF.terms.type, LDP.terms.Container, null)).toBe(1);
+    expect(store.countQuads('http://localhost:3457/data/auth/', RDF.terms.type, LDP.terms.BasicContainer, null)).toBe(1);
+    expect(store.countQuads('http://localhost:3457/data/auth/public', RDF.terms.type, 'http://xmlns.com/foaf/0.1/Project', null)).toBe(1);
+    expect(store.countQuads('http://localhost:3457/data/auth/public', RDF.terms.type, 'http://xmlns.com/foaf/0.1/Agent', null)).toBe(1);
   });
 });

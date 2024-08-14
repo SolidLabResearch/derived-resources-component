@@ -10,7 +10,6 @@ import type {
   SingleThreaded,
 } from '@solid/community-server';
 import {
-  createErrorMessage,
   getLoggerFor,
   PassthroughStore,
 } from '@solid/community-server';
@@ -144,20 +143,13 @@ export class CachedResourceStore extends PassthroughStore implements SingleThrea
     this.cacheProgress[identifier.path] = { identifier, representation: copy1 };
 
     // Don't await so caching doesn't block returning a result
-    representationToCached(copy1)
-      .then((newCached): void => {
-        // Progress entry being removed implies that the result was invalidated in the meantime
-        if (this.cacheProgress[identifier.path]?.identifier === identifier) {
-          this.cache.set(identifier.path, newCached);
-          delete this.cacheProgress[identifier.path];
-        }
-      })
-      .catch((err): void => {
-        // This just means the request was not interested in the data and closed the stream
-        if ((err as Error).message !== 'Premature close') {
-          this.logger.error(`Unable to cache representation for ${identifier.path}: ${createErrorMessage(err)}`);
-        }
-      });
+    representationToCached(copy1).then((newCached): void => {
+      // Progress entry being removed implies that the result was invalidated in the meantime
+      if (newCached && this.cacheProgress[identifier.path]?.identifier === identifier) {
+        this.cache.set(identifier.path, newCached);
+        delete this.cacheProgress[identifier.path];
+      }
+    }).catch((): void => {});
 
     return copy2;
   }

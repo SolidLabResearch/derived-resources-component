@@ -32,17 +32,8 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
   }
 
   public async canHandle({ identifier, metadata, subject }: DerivationMatcherInput): Promise<void> {
-    // Add query params so template match can be checked
-    let path = identifier.path;
-    if (isQueryResourceIdentifier(identifier)) {
-      const url = new URL(path);
-      for (const [ key, value ] of Object.entries(identifier.query)) {
-        url.searchParams.append(key, value);
-      }
-      path = url.toString();
-    }
     // Templates are relative to the resource they are linked to
-    const relative = path.slice(metadata.identifier.value.length);
+    const relative = identifier.path.slice(metadata.identifier.value.length);
     if (!this.isValidDerivedSubject(subject)) {
       throw new NotImplementedHttpError();
     }
@@ -51,12 +42,19 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
     if (templates.length !== 1) {
       throw new NotImplementedHttpError();
     }
-    const template = templates[0].object.value;
+    let template = templates[0].object.value;
+
+    // Removing query fragment capturing groups for now as matcher requires exactly (only) those keys to be present.
+    const queryMatch = /\{\?[^{}]+\}$/u.exec(template);
+    if (queryMatch) {
+      template = template.slice(0, queryMatch.index);
+    }
 
     const match = new Template(template).match(relative);
     if (!match) {
       throw new NotImplementedHttpError();
     }
+
     this.cache.set(identifier, match);
   }
 
@@ -78,7 +76,8 @@ export class TemplateDerivationMatcher extends DerivationMatcher {
     this.logger.debug(`Found derived resource match for ${identifier.path} with subject ${subject.value}`);
     return {
       identifier,
-      mappings: match,
+      // Since we currently ignore the query part of a URI template we need to add the query parameters here as well
+      mappings: { ...match, ...isQueryResourceIdentifier(identifier) ? identifier.query : {}},
       selectors: metadata.quads(subject as NamedNode, DERIVED.terms.selector).map((quad): string => quad.object.value),
       filter: filters[0].object.value,
       metadata: configMetadata,

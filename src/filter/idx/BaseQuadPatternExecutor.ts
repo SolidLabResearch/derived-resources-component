@@ -12,17 +12,12 @@ import { QuadPatternExecutor } from './QuadPatternExecutor';
 export class BaseQuadPatternExecutor extends QuadPatternExecutor {
   public async handle({ filter, representation }: QuadPatternExecutorArgs): Promise<Guarded<Readable>> {
     function matchFn(quad: Quad): Quad | undefined {
-      let match: Quad | undefined;
       for (const pos of [ 'subject', 'predicate', 'object', 'graph' ] as const) {
-        if (filter[pos]) {
-          if (filter[pos]?.termType === 'Variable') {
-            match = quad;
-          } else if (!quad[pos].equals(filter[pos])) {
-            return;
-          }
+        if (filter[pos] && filter[pos]?.termType !== 'Variable' && !quad[pos].equals(filter[pos])) {
+          return;
         }
       }
-      return match;
+      return quad;
     }
 
     const transform = transformSafely(representation.data, {
