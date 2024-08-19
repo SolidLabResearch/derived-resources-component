@@ -79,11 +79,12 @@ When starting the server with `npm run start:example`,
 several index related examples will also be created.
 The metadata for these can be seen in <http://localhost:3000/index/.meta>.
 
-Two derived resources are created,
-both of these applied to the data in the <http://localhost:3000/data/auth> container.
+Several derived resources are created,
+all of these applied to the data in the <http://localhost:3000/data/auth> container.
 
 * <http://localhost:3000/index/predicate> provides an index of all predicates.
 * <http://localhost:3000/index/type> provides an index of all `rdf:type` objects.
+* <http://localhost:3000/index/qpf> provides a [QPF](filters.md#quad-pattern-fragments) interface over the data.
 
 One of the two documents in the `data` container only provides read acces to the WebID `http://example.com/alice`.
 The server has been configured so that you can authenticate as a user by adding the WebID to the authorization header,
