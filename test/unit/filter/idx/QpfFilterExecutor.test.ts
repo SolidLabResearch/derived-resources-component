@@ -100,7 +100,7 @@ describe('QpfFilterExecutor', (): void => {
     expect(store.countQuads('http://example.com/foo', null, null, '')).toBe(2);
   });
 
-  it('returns a large number for the amount of triples if the data is streaming.', async(): Promise<void> => {
+  it('returns a large number for the amount of triples and a link to the next page.', async(): Promise<void> => {
     executor = new QpfFilterExecutor(quadPatternExecutor, 1);
     const result = await executor.handle(input);
 
@@ -111,6 +111,27 @@ describe('QpfFilterExecutor', (): void => {
     const graph = store.getSubjects(FOAF.terms.primaryTopic, '', null)[0];
     expect(store.getObjects('', VOID.terms.triples, graph)[0].value).toBe('1000000');
     expect(store.getObjects('', HYDRA.terms.totalItems, graph)[0].value).toBe('1000000');
+
+    const next = store.getObjects(null, HYDRA.terms.next, null);
+    expect(next).toHaveLength(1);
+  });
+
+  it('returns the data on a second page if there is a large amount of triples.', async(): Promise<void> => {
+    executor = new QpfFilterExecutor(quadPatternExecutor, 1);
+    (input.config.identifier as QueryResourceIdentifier).query.data = 'true';
+    const result = await executor.handle(input);
+
+    expect(result.metadata.contentType).toBe(INTERNAL_QUADS);
+    expect(result.metadata.identifier.value).toEqual(input.config.identifier.path);
+    const store = await readableToQuads(result.data);
+
+    const graph = store.getSubjects(FOAF.terms.primaryTopic, '', null)[0];
+    expect(store.getObjects('', VOID.terms.triples, graph)[0].value).toBe('1000000');
+    expect(store.getObjects('', HYDRA.terms.totalItems, graph)[0].value).toBe('1000000');
+    expect(store.countQuads(null, null, null, '')).toBe(2);
+
+    const next = store.getObjects(null, HYDRA.terms.next, null);
+    expect(next).toHaveLength(0);
   });
 
   it('always loads all triples for a correct count when the limit is set to 0.', async(): Promise<void> => {

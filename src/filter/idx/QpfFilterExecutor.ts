@@ -12,6 +12,7 @@ import {
 } from '@solid/community-server';
 import { DataFactory } from 'n3';
 import { stringToTerm } from 'rdf-string';
+import type { QueryResourceIdentifier } from '../../QueryResourceIdentifier';
 import { isQueryResourceIdentifier } from '../../QueryResourceIdentifier';
 import { mergeStreams, take } from '../../util/StreamUtil';
 import { DERIVED_TYPES, FOAF, HYDRA, RDF, SD, VOID } from '../../Vocabularies';
@@ -56,15 +57,24 @@ const fixedMetaQuads: Quad[] = [
 /**
  * A {@link FilterExecutor} exposing a QPF endpoint.
  * Due to the streaming nature of how data is used,
- * the response will always be a single page with all results.
+ * the response will always be two pages:
+ * the first page is empty with only the metadata,
+ * the next page will contain all the data as well.
  * For the same reason, the triple count will always be set to 1 million.
+ * The reason for using two pages is to prevent querying engines that are checking the counts
+ * from having to download all the data as well.
+ * The reason we don't return partial data on the first page
+ * is because we can't guarantee the order of the incoming data stream,
+ * so we can't know which triples would need to be returned on the second page.
  *
- * To somewhat circumvent the latter issue,
+ * To somewhat circumvent this issue,
  * a set amount of triples will be read into memory from the data stream,
  * before we generate the result stream.
  * If this causes the entire stream to be read,
  * we can give an accurate count result,
  * meaning only large result streams will have inaccurate results.
+ * Such cases will also immediately return all their results on the first page,
+ * instead of hiding their data on a second page.
  * By default, this value is set to 1000.
  * It can be set to 0 to always first read all results into memory for an accurate count.
  */
@@ -90,6 +100,7 @@ export class QpfFilterExecutor extends FilterExecutor {
 
   public async handle({ representations, config }: FilterExecutorInput): Promise<Representation> {
     const filter = this.generateFilter(isQueryResourceIdentifier(config.identifier) ? config.identifier.query : {});
+    const showData = isQueryResourceIdentifier(config.identifier) ? config.identifier.query.data === 'true' : false;
 
     const streams = await Promise.all(representations.map(
       async(representation): Promise<Readable> => this.quadPatternExecutor.handle({ filter, representation }),
@@ -106,12 +117,16 @@ export class QpfFilterExecutor extends FilterExecutor {
       if (tail.readableEnded) {
         merged = Readable.from(head);
         size = head.length;
-      } else {
+      } else if (showData) {
         merged = mergeStreams(Readable.from(head), tail);
+      } else {
+        tail.on('error', (): void => {});
+        tail.destroy();
+        merged = Readable.from([]);
       }
     }
 
-    const metaQuads = this.getMetaQuads(config.identifier, size);
+    const metaQuads = this.getMetaQuads(config.identifier, size, typeof size === 'undefined' && !showData);
     const metaStream = Readable.from(metaQuads);
 
     return new BasicRepresentation(mergeStreams(metaStream, merged), config.identifier, INTERNAL_QUADS);
@@ -132,19 +147,40 @@ export class QpfFilterExecutor extends FilterExecutor {
     return result;
   }
 
-  protected getMetaQuads(identifier: ResourceIdentifier, size = 1_000_000): Quad[] {
-    // Empty string is the identifier of the resource
-    const fragment = namedNode('');
+  protected getMetaQuads(identifier: ResourceIdentifier, size = 1_000_000, nextPage = false): Quad[] {
+    const fragment = namedNode(this.identifierToString(identifier));
     const dataset = namedNode(`${identifier.path}#dataset`);
-    return [
+    const quads = [
       quad(graph, FOAF.terms.primaryTopic, fragment, graph),
       quad(fragment, VOID.terms.triples, literal(size), graph),
       quad(fragment, HYDRA.terms.totalItems, literal(size), graph),
+      quad(fragment, HYDRA.terms.view, fragment, graph),
       quad(dataset, VOID.terms.subset, fragment, graph),
       quad(dataset, SD.terms.defaultGraph, defaultGraphParam, graph),
       quad(dataset, HYDRA.terms.search, search, graph),
       quad(search, HYDRA.terms.template, literal(`${identifier.path}{?s,p,o,g}`), graph),
       ...fixedMetaQuads,
     ];
+    if (nextPage) {
+      // Add a link to the data page if necessary
+      const nextIdentifier: QueryResourceIdentifier = {
+        ...identifier,
+        query: {
+          ...isQueryResourceIdentifier(identifier) ? identifier.query : {},
+          data: 'true',
+        },
+      };
+      quads.push(quad(fragment, HYDRA.terms.next, namedNode(this.identifierToString(nextIdentifier))));
+    }
+
+    return quads;
+  }
+
+  protected identifierToString(identifier: ResourceIdentifier): string {
+    if (!isQueryResourceIdentifier(identifier)) {
+      return identifier.path;
+    }
+    const search = new URLSearchParams(identifier.query);
+    return `${identifier.path}?${search.toString()}`;
   }
 }

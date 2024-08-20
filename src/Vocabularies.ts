@@ -33,11 +33,13 @@ export const HYDRA = createVocabulary(
   'http://www.w3.org/ns/hydra/core#',
   'first',
   'mapping',
+  'next',
   'property',
   'search',
   'template',
   'totalItems',
   'variable',
+  'view',
 );
 
 export const SD = createVocabulary(
