@@ -53,8 +53,6 @@ const fixedMetaQuads: Quad[] = [
   quad(graphNode, HYDRA.terms.property, SD.terms.graph, graph),
 ];
 
-// TODO: README (also shacl)
-
 /**
  * A {@link FilterExecutor} exposing a QPF endpoint.
  * Due to the streaming nature of how data is used,
