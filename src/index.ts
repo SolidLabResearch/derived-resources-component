@@ -27,6 +27,7 @@ export * from './filter/CachedFilterExecutor';
 export * from './filter/Filter';
 export * from './filter/FilterExecutor';
 export * from './filter/FilterHandler';
+export * from './filter/LatestFilterExecutor';
 export * from './filter/N3FilterExecutor';
 export * from './filter/ShaclFilterExecutor';
 export * from './filter/SparqlFilterExecutor';

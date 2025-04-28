@@ -13,22 +13,34 @@
 
     {
       "@id": "urn:solid-server:default:FilterParser",
-      "@type": "ResourceFilterParser",
-      "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
-      "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
-      "source": {
-        "@id": "urn:solid-server:default:MappingFilterParser",
-        "@type": "MappingFilterParser",
-        "source": {
-          "@type": "WaterfallHandler",
-          "handlers": [
-            { "@type": "QpfFilterParser" },
-            { "@type": "QuadPatternFilterParser" },
-            { "@type": "ShaclFilterParser" },
-            { "@type": "SparqlFilterParser" },
-            { "@type": "InputFilterParser" }
-          ]
+      "@type": "WaterfallHandler",
+      "handlers": [
+        {
+          "@id": "urn:solid-server:default:ResourceFilterParser",
+          "@type": "ResourceFilterParser",
+          "store": { "@id": "urn:solid-server:default:ResourceStore_Patching" },
+          "identifierStrategy": { "@id": "urn:solid-server:default:IdentifierStrategy" },
+          "source": {
+            "@id": "urn:solid-server:default:MappingFilterParser"
+          }
+        },
+        {
+          "@id": "urn:solid-server:default:MappingFilterParser"
         }
+      ]
+    },
+    {
+      "@id": "urn:solid-server:default:MappingFilterParser",
+      "@type": "MappingFilterParser",
+      "source": {
+        "@type": "WaterfallHandler",
+        "handlers": [
+          { "@type": "QpfFilterParser" },
+          { "@type": "QuadPatternFilterParser" },
+          { "@type": "ShaclFilterParser" },
+          { "@type": "SparqlFilterParser" },
+          { "@type": "InputFilterParser" }
+        ]
       }
     },
 
@@ -39,6 +51,10 @@
         "@id": "urn:solid-server:default:FilterExecutorHandler",
         "@type": "WaterfallHandler",
         "handlers": [
+          {
+            "@id": "urn:solid-server:default:LatestFilterExecutor",
+            "@type": "LatestFilterExecutor"
+          },
           {
             "@id": "urn:solid-server:default:QpfFilterExecutor",
             "@type": "QpfFilterExecutor",

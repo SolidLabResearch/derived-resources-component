@@ -55,3 +55,10 @@
         derived:selector <../data/container/*>;
         derived:filter <../filters/shacl>
     ].
+
+<>
+    derived:derivedResource [
+        derived:template "latest";
+        derived:selector <../data/container/*>;
+        derived:filter "latest"
+    ].

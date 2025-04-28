@@ -103,6 +103,7 @@ That metadata defines the following derived resources:
   - **Note:** Currently not working due to https://github.com/CommunitySolidServer/CommunitySolidServer/issues/1889
 - <http://localhost:3000/derived/pattern>: A derived resource whose selectors are all resources in a container.
 - <http://localhost:3000/derived/multiple>: A derived resource with multiple selectors.
+- <http://localhost:3000/derived/latest>: A derived resource that returns the most recent resource from a container.
 
 The metadata of <http://localhost:3000/dummy.txt> also defines a derived resource,
 causing that URl to return the results of a derivation instead of the contents of the template file.
